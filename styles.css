@@ -1,106 +1,602 @@
+/* ==========================================================================
+   TRIDENT — dark-luxury one-pager
+   --------------------------------------------------------------------------
+   Type system: Manrope 800 caps for display, Instrument Serif italic in gold
+   for every accent word, DM Sans for body and tracked micro-labels.
+   Motion lives in script.js; this file holds layout, states and fallbacks.
+
+    0. Tokens            6. Ticker            12. Cursor
+    1. Base / reset      7. Games             13. Intro curtain
+    2. Shared atoms      8. Studio            14. Motion states (hide-before-reveal)
+    3. Buttons + roll    9. Quote             15. Responsive
+    4. Header / nav     10. Contact           16. No-JS + reduced motion
+    5. Hero             11. Footer finale
+   ========================================================================== */
+
+/* 0. Tokens ---------------------------------------------------------------- */
 :root{
-  --bg:#08090b;
-  --surface:#101114;
-  --surface-2:#15171b;
+  --bg:#07080a;
+  --bg-2:#0b0c0f;
   --text:#f3f1eb;
-  --muted:#8e8f93;
-  --line:rgba(255,255,255,.10);
+  --text-2:#cfcdc6;
+  --muted:#a09e97;          /* body copy on --bg ≈ 7:1 */
+  --dim:#807e78;            /* micro labels ≈ 4.8:1 */
+  --line:rgba(243,241,235,.09);
+  --line-2:rgba(243,241,235,.18);
   --gold:#f4c21b;
-  --gold-soft:#c89d18;
-  --max:1180px;
+  --gold-hi:#ffe27a;
+  --gold-lo:#a97c0c;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-io:cubic-bezier(.77,0,.18,1);   /* the "wipe" curve shared with GSAP */
+  --max:1320px;
+  --gutter:clamp(20px,4vw,64px);
+  --pad-x:max(var(--gutter),calc((100% - var(--max)) / 2));
+  --header-h:80px;
+  --f-display:Manrope,system-ui,sans-serif;
+  --f-serif:"Instrument Serif","Times New Roman",Georgia,serif;
+  --f-body:"DM Sans",system-ui,sans-serif;
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",system-ui,sans-serif;overflow-x:hidden}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");z-index:20}
+
+/* 1. Base / reset ---------------------------------------------------------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--bg);scroll-padding-top:calc(var(--header-h) + 16px)} /* focused controls never land under the fixed header */
+@media (prefers-reduced-motion:no-preference){html:not(.lenis){scroll-behavior:smooth}}
+/* with ScrollTrigger live, native smooth scrolling is cancelled by its refreshes: script.js tweens anchors itself */
+html.motion:not(.no-anim){scroll-behavior:auto}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+/* film grain — one static layer, never repaints on scroll */
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:150;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E")}
+img,svg,canvas{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
-.site-header{height:82px;display:flex;align-items:center;justify-content:space-between;max-width:var(--max);margin:auto;padding:0 28px;position:absolute;left:0;right:0;top:0;z-index:10}
-.brand,.footer-brand{display:flex;align-items:center;gap:12px;font-family:Manrope,sans-serif;font-weight:800;letter-spacing:.16em}
-.brand img{width:38px;height:38px;object-fit:cover;border-radius:50%;filter:drop-shadow(0 0 12px rgba(244,194,27,.18))}
-.nav{display:flex;align-items:center;gap:34px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#bdbdc0}
-.nav a{transition:.25s ease}
-.nav a:hover{color:#fff}
-.nav-cta{border:1px solid var(--line);padding:12px 16px;border-radius:999px;color:#fff!important}
-.menu-toggle{display:none;background:none;border:0}
-.hero{min-height:850px;height:100vh;max-height:980px;position:relative;display:flex;align-items:center;max-width:1400px;margin:auto;padding:100px 8vw 60px;overflow:hidden}
-.hero:before{content:"";position:absolute;width:650px;height:650px;border-radius:50%;background:radial-gradient(circle,rgba(244,194,27,.10),transparent 65%);right:8%;top:10%}
-.hero-content{position:relative;z-index:2;max-width:730px}
-.eyebrow{display:flex;align-items:center;gap:10px;color:#9d9ea2;font-size:10px;letter-spacing:.22em;font-weight:700;margin:0 0 24px}
-.eyebrow span{width:28px;height:1px;background:var(--gold);display:inline-block}
-h1,h2,h3{font-family:Manrope,sans-serif;margin:0;letter-spacing:-.055em;line-height:.93}
-h1{font-size:clamp(58px,8vw,116px);font-weight:800}
-h1 em,h2 em{font-style:normal;color:var(--gold)}
-.hero-copy{max-width:520px;color:#9b9ca0;font-size:16px;line-height:1.75;margin:30px 0}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
-.button{display:inline-flex;align-items:center;justify-content:center;gap:20px;padding:16px 21px;border-radius:2px;font-size:10px;letter-spacing:.15em;font-weight:800;transition:transform .25s,background .25s,border .25s}
-.button:hover{transform:translateY(-3px)}
-.button-primary{background:var(--gold);color:#090a0b}
-.button-primary:hover{background:#ffd43d}
-.button-ghost{border:1px solid var(--line);color:#ddd}
-.hero-mark{position:absolute;right:4%;top:50%;transform:translateY(-50%);width:min(40vw,560px);aspect-ratio:1;display:grid;place-items:center;opacity:.9}
-.hero-mark img{width:60%;aspect-ratio:1;object-fit:cover;border-radius:50%;box-shadow:0 0 90px rgba(244,194,27,.12)}
-.mark-ring{position:absolute;width:82%;height:82%;border:1px solid rgba(244,194,27,.15);border-radius:50%;animation:spin 24s linear infinite}
-.mark-ring:after{content:"";position:absolute;width:6px;height:6px;background:var(--gold);border-radius:50%;top:12%;left:17%;box-shadow:0 0 20px var(--gold)}
-.hero-orbit{position:absolute;border:1px solid rgba(255,255,255,.04);border-radius:50%;pointer-events:none}
-.orbit-one{width:720px;height:720px;right:-220px;top:100px}
-.orbit-two{width:980px;height:980px;right:-340px;top:-40px}
-.scroll-note{position:absolute;bottom:28px;left:8vw;color:#55575c;font-size:9px;letter-spacing:.2em}
-.scroll-note span{color:var(--gold);margin-left:12px}
-.ticker{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);white-space:nowrap;color:#67686c;font-family:Manrope,sans-serif;font-weight:700;font-size:11px;letter-spacing:.25em;padding:19px 0}
-.ticker div{display:inline-block;animation:ticker 24s linear infinite}
-.ticker span{color:var(--gold);padding:0 25px}
-.section{max-width:var(--max);margin:auto;padding:150px 28px}
-.section-heading{display:flex;justify-content:space-between;align-items:end;gap:50px;margin-bottom:70px}
-h2{font-size:clamp(48px,6.5vw,86px)}
-.section-intro{max-width:300px;color:var(--muted);font-size:14px;line-height:1.7}
-.game-card{display:grid;grid-template-columns:1.2fr .8fr;background:var(--surface);border:1px solid var(--line);min-height:570px}
-.game-art{position:relative;overflow:hidden;min-height:500px;background:radial-gradient(circle at 50% 45%,#3b3210 0,#171717 28%,#0c0d0f 68%)}
-.game-grid{position:absolute;inset:-20%;opacity:.16;background-image:linear-gradient(rgba(244,194,27,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(244,194,27,.35) 1px,transparent 1px);background-size:55px 55px;transform:perspective(500px) rotateX(55deg) translateY(30%);transform-origin:center}
-.game-glow{position:absolute;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle,rgba(244,194,27,.34),transparent 65%);left:50%;top:45%;transform:translate(-50%,-50%)}
-.game-badge{position:absolute;top:24px;left:24px;border:1px solid rgba(255,255,255,.16);padding:9px 12px;font-size:8px;letter-spacing:.18em;color:#c5c5c5}
-.game-symbol{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);font-size:150px;color:var(--gold);text-shadow:0 0 70px rgba(244,194,27,.45);animation:float 5s ease-in-out infinite}
-.game-art-label{position:absolute;left:32px;bottom:28px;font-family:Manrope,sans-serif;font-size:25px;line-height:.85;letter-spacing:.06em;color:#d7d7d2}
-.game-art-label strong{font-size:43px;color:#fff}
-.game-info{padding:55px;display:flex;flex-direction:column;justify-content:center}
-.game-info h3{font-size:clamp(42px,4vw,64px);margin-bottom:22px}
-.game-info>p:not(.eyebrow){color:var(--muted);line-height:1.75;font-size:14px;max-width:420px}
-.game-meta{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:30px 0;padding:20px 0;gap:15px}
-.game-meta small{display:block;color:#606166;font-size:8px;letter-spacing:.14em;margin-bottom:7px}
-.game-meta strong{font-size:10px;letter-spacing:.08em}
-.live{color:#b6b6b2}.wide{width:100%}
-.studio-section{display:grid;grid-template-columns:.9fr 1.1fr;gap:100px;align-items:center}
-.studio-image{position:relative;aspect-ratio:1;display:grid;place-items:center;background:radial-gradient(circle,rgba(244,194,27,.11),transparent 62%);border:1px solid var(--line)}
-.studio-image img{width:62%;border-radius:50%;box-shadow:0 0 80px rgba(244,194,27,.08)}
-.image-caption{position:absolute;bottom:20px;left:22px;font-size:8px;letter-spacing:.18em;color:#64666a}
-.studio-copy>p:not(.eyebrow){color:var(--muted);line-height:1.8;font-size:14px;max-width:540px}
-.principles{border-top:1px solid var(--line);margin-top:38px}
-.principles>div{display:grid;grid-template-columns:42px 1fr 1fr;align-items:center;padding:17px 0;border-bottom:1px solid var(--line)}
-.principles span{font-size:9px;color:var(--gold)}
-.principles strong{font-size:10px;letter-spacing:.14em}
-.principles small{color:#67686d;font-size:11px}
-.quote-section{padding:70px 28px 150px;max-width:1000px;margin:auto;text-align:center}
-.quote-section blockquote{font-family:Manrope,sans-serif;font-size:clamp(34px,5vw,66px);font-weight:700;line-height:.98;letter-spacing:-.05em;margin:35px 0}
-.quote-line{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
-.contact-section{display:flex;justify-content:space-between;gap:60px;border-top:1px solid var(--line)}
-.contact-card{max-width:430px;padding-top:15px}
-.contact-card>p{color:var(--muted);line-height:1.7;font-size:14px}
-.contact-card>a{display:inline-block;font-family:Manrope,sans-serif;font-weight:700;font-size:clamp(22px,3vw,38px);border-bottom:1px solid var(--gold);padding-bottom:8px;margin:8px 0 20px}
-footer{max-width:var(--max);margin:auto;padding:35px 28px 45px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;color:#55575b;font-size:10px;letter-spacing:.08em}
-.footer-brand{color:#aaa;font-size:10px}.footer-brand img{width:26px;height:26px;border-radius:50%}footer a{color:#8e8f93}
-.cursor-glow{position:fixed;z-index:30;pointer-events:none;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(244,194,27,.06),transparent 68%);transform:translate(-50%,-50%);display:none}
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}.reveal.visible{opacity:1;transform:none}
-@keyframes spin{to{transform:rotate(360deg)}}@keyframes float{50%{transform:translate(-50%,-55%)}}@keyframes ticker{to{transform:translateX(-50%)}}
-@media (min-width:900px){.cursor-glow{display:block}}
-@media (max-width:850px){
-  .site-header{padding:0 20px}.menu-toggle{display:block;z-index:12}.menu-toggle span{display:block;width:24px;height:1px;background:#fff;margin:6px}
-  .nav{position:fixed;inset:0;background:#08090b;display:flex;flex-direction:column;justify-content:center;gap:28px;opacity:0;pointer-events:none;transform:translateY(-10px);transition:.3s}
-  .nav.open{opacity:1;pointer-events:auto;transform:none}.nav a{font-size:15px}
-  .hero{min-height:760px;height:auto;padding:150px 24px 100px}.hero-mark{opacity:.22;width:85vw;right:-20%;top:55%}.hero-content{max-width:650px}
-  .scroll-note{left:24px}.section{padding:100px 20px}.section-heading{display:block;margin-bottom:45px}.section-intro{margin-top:25px}
-  .game-card{grid-template-columns:1fr}.game-art{min-height:430px}.game-info{padding:34px 25px}
-  .studio-section{grid-template-columns:1fr;gap:55px}.studio-image{max-width:520px}
-  .contact-section{display:block}.contact-card{margin-top:35px}footer{padding:30px 20px;gap:20px;flex-wrap:wrap}
+button{font:inherit;color:inherit}
+p{margin:0}
+ul,dl,dd,figure{margin:0;padding:0}
+::selection{background:var(--gold);color:#0a0a0b}
+:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:4px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip-link{position:fixed;left:16px;top:-80px;z-index:400;background:var(--gold);color:#0a0a0b;padding:14px 18px;border-radius:999px;font:700 12px/1 var(--f-display);letter-spacing:.08em;transition:top .3s var(--ease-out)}
+.skip-link:focus-visible{top:16px}
+main:focus,section:focus{outline:none}
+
+/* 2. Shared atoms ---------------------------------------------------------- */
+h1,h2,h3{font-family:var(--f-display);margin:0;font-weight:800;letter-spacing:-.05em;word-spacing:.06em;line-height:.9}
+/* every accent word: serif italic gold */
+h1 em,h2 em,blockquote em,.ticker em,.frame-cap em{font-family:var(--f-serif);font-style:italic;font-weight:400;color:var(--gold);letter-spacing:-.01em;word-spacing:0}
+h1 em,h2 em{font-size:1.07em;padding-right:.04em}
+.eyebrow{display:flex;align-items:center;gap:14px;color:var(--muted);font:600 11px/1.4 var(--f-body);letter-spacing:.26em;text-transform:uppercase;margin:0}
+.eyebrow-line{width:34px;height:1px;background:var(--gold);display:inline-block;flex:none;transform-origin:left}
+.section-meta{display:flex;align-items:center;gap:16px;margin-bottom:30px}
+.section-num{font:italic 400 17px/1 var(--f-serif);color:var(--gold);letter-spacing:.02em}
+.live-dot{position:relative;display:inline-block;width:7px;height:7px;border-radius:50%;background:#3ddc84;box-shadow:0 0 12px rgba(61,220,132,.7);flex:none}
+.live-dot::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(61,220,132,.6);animation:ping 2.2s var(--ease-out) infinite}
+@keyframes ping{from{transform:scale(.4);opacity:1}to{transform:scale(1.9);opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Framed still — shared by the hero and the studio image.
+   contrast() pushes the logo's grey disc to black; `screen` then dissolves it into the glow,
+   leaving only the gold-and-white mark, lit like a product shot. */
+.frame{position:relative;border:1px solid var(--line)}
+.frame-media{--ground:radial-gradient(120% 80% at 50% 40%,#1d180a 0,#0e0d0b 46%,#08090b 82%);position:absolute;inset:0;overflow:hidden;isolation:isolate;background:var(--ground)}
+.frame-glow{position:absolute;left:50%;top:46%;width:130%;aspect-ratio:1;transform:translate(-50%,-50%);background:radial-gradient(circle,rgba(244,194,27,.26),rgba(244,194,27,.06) 38%,transparent 62%)}
+/* centred with margins (percentages of the frame width), so GSAP is free to own the transform */
+.frame-media img{position:absolute;left:50%;top:46%;width:108%;max-width:none;aspect-ratio:1;margin:-54% 0 0 -54%;object-fit:cover;filter:contrast(1.7) brightness(.85);mix-blend-mode:screen;-webkit-mask-image:radial-gradient(circle,#000 56%,transparent 70.5%);mask-image:radial-gradient(circle,#000 56%,transparent 70.5%)}
+.frame-ticks i{position:absolute;width:14px;height:14px;border:0 solid var(--gold);pointer-events:none}
+.frame-ticks i:nth-child(1){left:-1px;top:-1px;border-left-width:1px;border-top-width:1px}
+.frame-ticks i:nth-child(2){right:-1px;top:-1px;border-right-width:1px;border-top-width:1px}
+.frame-ticks i:nth-child(3){left:-1px;bottom:-1px;border-left-width:1px;border-bottom-width:1px}
+.frame-ticks i:nth-child(4){right:-1px;bottom:-1px;border-right-width:1px;border-bottom-width:1px}
+
+/* 3. Buttons + rolling text ------------------------------------------------ */
+.button{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:16px;min-height:56px;padding:0 28px;border-radius:999px;font:700 11px/1 var(--f-display);letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;transition:color .45s var(--ease-out),border-color .45s var(--ease-out),box-shadow .45s var(--ease-out)}
+.button-primary{color:#0b0b0c;background:var(--gold);box-shadow:0 18px 44px -18px rgba(244,194,27,.6),inset 0 1px 0 rgba(255,255,255,.45)}
+.button-ghost{color:var(--text);border:1px solid var(--line-2)}
+.button-icon{display:grid;place-items:center;width:30px;height:30px;margin-right:-14px;border-radius:50%;background:#0b0b0c;color:var(--gold);font-size:13px;line-height:1;transition:transform .6s var(--ease-out)}
+/* direction-aware fill: JS writes --x / --y where the pointer crossed the edge */
+.button-fill{position:absolute;z-index:-1;left:var(--x,50%);top:var(--y,50%);width:240%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%) scale(0);transition:transform .75s var(--ease-out);pointer-events:none}
+.button-primary .button-fill{background:#fff3cf}
+.button-ghost .button-fill{background:var(--text)}
+.wide{width:100%}
+
+/* rolling text — JS duplicates the label into a clone row that rolls in letter by letter */
+.roll{display:inline-block;position:relative}
+.roll-inner{display:inline-block;position:relative;overflow:hidden;vertical-align:top;line-height:1.25;padding:0 .02em;margin:-.125em 0}
+.roll-line{display:block;white-space:pre}
+.roll-clone{position:absolute;left:.02em;top:100%}
+.roll .ch{display:inline-block;white-space:pre;transition:transform .65s var(--ease-out);transition-delay:calc(var(--ci,0) * 14ms)}
+
+@media (hover:hover){
+  .button-primary:hover{box-shadow:0 24px 54px -18px rgba(244,194,27,.75),inset 0 1px 0 rgba(255,255,255,.5)}
+  .button-ghost:hover{color:#0b0b0c;border-color:var(--text)}
+  .button:hover .button-fill{transform:translate(-50%,-50%) scale(1)}
+  .button-primary[href^="#"]:hover .button-icon{transform:translateY(3px)}
+  .button-primary[target]:hover .button-icon{transform:rotate(45deg)}
+  a:hover .roll .ch,button:hover .roll .ch{transform:translateY(-100%)}
 }
-@media (max-width:500px){
-  h1{font-size:54px}.hero-copy{font-size:14px}.hero-actions{display:grid}.button{width:100%}.game-meta{grid-template-columns:1fr}.game-meta div{display:flex;justify-content:space-between}.game-symbol{font-size:110px}
+a:focus-visible .roll .ch{transform:translateY(-100%)}
+
+/* 4. Header / nav ---------------------------------------------------------- */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--header-h);display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 var(--pad-x)}
+/* opaque gradient instead of a backdrop blur: same look, no per-frame blur cost */
+.header-glass{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,rgba(8,9,11,.985),rgba(8,9,11,.95));border-bottom:1px solid var(--line);opacity:0;transition:opacity .5s var(--ease-out),transform .7s var(--ease-out)}
+.header-progress{position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,var(--gold-lo),var(--gold) 60%,var(--gold-hi));transform:scaleX(0);transform-origin:left}
+.site-header.is-scrolled .header-glass{opacity:1}
+/* static tiers (no JS / script.js never booted) can't toggle .is-scrolled: keep the bar solid */
+:is(html:not(.js),html.no-anim:not(.ready)) .header-glass{opacity:1}
+/* the header hides by moving its children, never itself (a transformed header would trap the fixed mobile menu) */
+.site-header>.brand,.site-header>.menu-toggle{position:relative;z-index:2;transition:transform .7s var(--ease-out)}
+.site-header.is-hidden>.header-glass,.site-header.is-hidden>.brand,.site-header.is-hidden>.menu-toggle{transform:translate3d(0,-120px,0)}
+/* the empty header box stays put while hidden: let clicks / taps fall through to the page */
+.site-header.is-hidden{pointer-events:none}
+@media (min-width:851px){
+  .site-header>.nav{transition:transform .7s var(--ease-out)}
+  .site-header.is-hidden>.nav{transform:translate3d(0,-120px,0)}
+}
+
+.brand{display:flex;align-items:center;gap:14px;font:800 13px/1 var(--f-display);letter-spacing:.32em;min-height:44px}
+.brand-mark{position:relative;width:40px;height:40px;border-radius:50%;flex:none;transition:transform 1.1s var(--ease-out)}
+.brand-mark::after{content:"";position:absolute;inset:-3px;border-radius:50%;border:1px solid rgba(244,194,27,.3)}
+.brand-mark img{width:100%;height:100%;object-fit:cover;border-radius:50%;filter:contrast(1.35)}
+@media (hover:hover){.brand:hover .brand-mark{transform:rotate(360deg)}}
+
+.nav{position:relative;z-index:1;display:flex;align-items:center;gap:26px}
+.nav-list{display:flex;align-items:center;gap:6px;list-style:none;margin:0;padding:0}
+.nav-link{position:relative;display:flex;align-items:flex-start;gap:6px;min-height:44px;padding:16px 14px 14px;font:600 12px/1 var(--f-display);letter-spacing:.16em;text-transform:uppercase;color:var(--text-2);transition:color .4s var(--ease-out)}
+.nav-num{font:italic 400 13px/1 var(--f-serif);letter-spacing:0;color:var(--gold);opacity:.55;transform:translateY(-5px);transition:opacity .4s}
+.nav-link::after{content:"";position:absolute;left:14px;right:14px;bottom:8px;height:1px;background:var(--gold);transform:scaleX(0);transform-origin:right;transition:transform .6s var(--ease-out)}
+.nav-link:focus-visible,.nav-link.is-active{color:#fff}
+.nav-link.is-active .nav-num{opacity:1}
+.nav-link:focus-visible::after,.nav-link.is-active::after{transform:scaleX(1);transform-origin:left}
+/* hover only where hover is real, so a tapped link on a touch tablet never stays "lit" */
+@media (hover:hover){
+  .nav-link:hover{color:#fff}
+  .nav-link:hover::after{transform:scaleX(1);transform-origin:left}
+}
+.nav-cta{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;gap:12px;min-height:44px;padding:0 7px 0 20px;border:1px solid var(--line-2);border-radius:999px;font:700 11px/1 var(--f-display);letter-spacing:.16em;text-transform:uppercase;color:#fff;transition:color .45s var(--ease-out),border-color .45s var(--ease-out)}
+.nav-cta-fill{position:absolute;inset:0;z-index:-1;background:var(--gold);border-radius:inherit;transform:translateY(101%);transition:transform .65s var(--ease-out)}
+.nav-cta-icon{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--gold);color:#0b0b0c;font-size:13px;transition:background .45s var(--ease-out),color .45s var(--ease-out),transform .6s var(--ease-out)}
+@media (hover:hover){
+  .nav-cta:hover{color:#0b0b0c;border-color:var(--gold)}
+  .nav-cta:hover .nav-cta-fill{transform:none}
+  .nav-cta:hover .nav-cta-icon{background:#0b0b0c;color:var(--gold);transform:rotate(45deg)}
+}
+.nav-kicker,.nav-foot{display:none}
+.menu-toggle{display:none}
+
+/* 5. Hero ------------------------------------------------------------------ */
+.hero{position:relative;isolation:isolate;overflow:hidden;min-height:max(100svh,720px);display:flex;flex-direction:column;padding:calc(var(--header-h) + 28px) var(--pad-x) 0}
+.hero-dust{position:absolute;inset:0;width:100%;height:100%;z-index:-1;pointer-events:none}
+.hero-bg{position:absolute;inset:0;z-index:-2;pointer-events:none}
+.hero-bg::after{content:"";position:absolute;left:0;right:0;bottom:0;height:30%;background:linear-gradient(to bottom,transparent,var(--bg))}
+.hero-glow{position:absolute;width:min(80vw,1040px);aspect-ratio:1;right:-12%;top:48%;transform:translateY(-50%);border-radius:50%;background:radial-gradient(circle,rgba(244,194,27,.12) 0%,rgba(244,194,27,.04) 36%,transparent 66%)}
+.hero-rule{position:absolute;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(255,255,255,.05) 30%,rgba(255,255,255,.05) 70%,transparent)}
+.rule-a{left:var(--pad-x)}
+.rule-b{right:var(--pad-x)}
+
+/* desktop: copy column left, framed still right; reading order eyebrow → title → copy → actions */
+.hero-inner{flex:1;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"eyebrow frame" "title frame" "copy frame" "actions frame";align-content:center;column-gap:clamp(40px,5vw,90px);padding:24px 0 48px}
+.hero-eyebrow{grid-area:eyebrow;align-self:end}
+.hero-title{grid-area:title;font-size:clamp(54px,7.5vw,118px);line-height:.88;max-width:7em;margin:30px 0 32px;margin-left:-.04em}
+.hero-title em{font-size:1.1em;line-height:.95;letter-spacing:-.015em}
+/* optical alignment: the italic W's serif hangs back to the roman column; the split line masks
+   reach a little further left (padding out, margin back) so the hung glyph is never clipped */
+.hero-title em{margin-left:-.1em}
+/* SplitText can leave an empty clone of a wrapper at a line start: it must not carry margins/padding */
+h1 em:empty,h2 em:empty,blockquote em:empty{display:none}
+.hero-title .line-mask{padding-left:.14em;margin-left:-.14em}
+.hero-copy{grid-area:copy;max-width:440px;color:var(--muted);font-size:16.5px;line-height:1.72}
+.hero-copy,.section-intro,.game-desc,.studio-copy>p,.contact-card>p{text-wrap:pretty}
+.hero-eyebrow{text-wrap:balance}
+/* keyboard focus is never drawn on the half-faded (scrubbed) hero copy */
+.hero-inner:has(:focus-visible){opacity:1!important}
+.hero-actions{grid-area:actions;align-self:start;display:flex;gap:12px;flex-wrap:wrap;margin-top:40px}
+
+.hero-frame{grid-area:frame;align-self:center;justify-self:end;width:clamp(270px,27vw,440px);aspect-ratio:3/4;transform-style:preserve-3d}
+.frame-orbit{position:absolute;left:50%;top:46%;width:86%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(244,194,27,.13)}
+.frame-orbit::after{content:"";position:absolute;inset:7%;border-radius:50%;border:1px dashed rgba(243,241,235,.07)}
+.frame-cap{position:absolute;left:calc(100% + 18px);top:0;writing-mode:vertical-rl;color:var(--dim);font:600 10px/1 var(--f-body);letter-spacing:.3em;text-transform:uppercase;white-space:nowrap}
+.frame-cap em{font-size:12px;letter-spacing:0;margin:8px 0}
+
+.hero-foot{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 0 30px;border-top:1px solid var(--line)}
+.scroll-note{display:flex;align-items:center;gap:16px;font:600 10px/1 var(--f-body);letter-spacing:.28em;color:var(--dim)}
+.scroll-line{position:relative;width:64px;height:1px;background:var(--line-2);overflow:hidden}
+.scroll-line::after{content:"";position:absolute;inset:0;background:var(--gold);transform:translateX(-100%);animation:scrollLine 2.4s var(--ease-io) infinite}
+@keyframes scrollLine{0%{transform:translateX(-100%)}55%{transform:translateX(0)}100%{transform:translateX(101%)}}
+.hero-live{display:inline-flex;align-items:center;gap:12px;min-height:44px;padding:0 18px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.025);font:600 10.5px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:var(--text-2);transition:border-color .4s var(--ease-out),background .4s var(--ease-out)}
+.hero-live-sep{color:var(--dim)}
+.hero-live-muted{color:var(--muted)}
+@media (hover:hover){.hero-live:hover{border-color:rgba(244,194,27,.45);background:rgba(244,194,27,.06)}}
+
+/* 6. Ticker ---------------------------------------------------------------- */
+.ticker{position:relative;overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:clamp(22px,3vw,38px) 0;background:linear-gradient(180deg,var(--bg),var(--bg-2))}
+.ticker::before,.ticker::after{content:"";position:absolute;top:0;bottom:0;width:12vw;z-index:2;pointer-events:none}
+.ticker::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.ticker::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent)}
+.ticker-track{display:flex;width:max-content;animation:ticker 46s linear infinite}
+html.marquee-js .ticker-track{will-change:transform} /* JS writes its transform every frame: keep it a compositor layer */
+.ticker-group{flex:none;margin:0;padding-right:.5em;white-space:nowrap;font:800 clamp(44px,7vw,116px)/1.05 var(--f-display);letter-spacing:-.045em;color:#ecebe5}
+.ticker-group em{font-size:1.08em;padding:0 .04em}
+.tk-star{display:inline-block;margin:0 .5em;font-size:.3em;color:var(--gold);vertical-align:.6em;text-shadow:0 0 22px rgba(244,194,27,.55)}
+@keyframes ticker{to{transform:translate3d(-50%,0,0)}}
+
+/* 7. Games ----------------------------------------------------------------- */
+.section{width:100%;max-width:calc(var(--max) + var(--gutter) * 2);margin:0 auto;padding:clamp(110px,13vw,190px) var(--gutter)}
+/* native anchor offset (also keeps the browser's own hash jump on load under the header) */
+:is(#games,#studio,#contact){scroll-margin-top:-16px} /* + html scroll-padding = exactly the header height */
+h2{font-size:clamp(48px,7.2vw,116px)}
+.section-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:50px;margin-bottom:clamp(48px,6vw,84px)}
+.section-intro{max-width:300px;color:var(--muted);font-size:15px;line-height:1.7;padding-bottom:12px}
+
+.game-stage{position:relative}
+.game-card{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1.22fr) minmax(0,.78fr);border-radius:24px;border:1px solid var(--line);background:linear-gradient(160deg,#121318 0%,#0c0d10 60%);overflow:hidden;box-shadow:0 60px 120px -60px rgba(0,0,0,.9)}
+.game-card::before{content:"";position:absolute;inset:0;z-index:3;border-radius:inherit;pointer-events:none;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+/* pointer-depth layers move every frame under the cursor: compositor-only */
+@media (hover:hover) and (pointer:fine){html.motion .game-card [data-depth],html.motion .card-light{will-change:transform}}
+.card-light{position:absolute;z-index:4;left:0;top:0;width:640px;height:640px;margin:-320px 0 0 -320px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(255,228,140,.12),rgba(255,228,140,.035) 40%,transparent 68%);opacity:0;transition:opacity .6s var(--ease-out)}
+.game-card.is-hover .card-light{opacity:1}
+
+.game-art{position:relative;min-height:580px;overflow:hidden;background:radial-gradient(ellipse 70% 60% at 50% 44%,#3d310b 0%,#1a170f 34%,#101113 72%);border-right:1px solid var(--line)}
+.game-art-inner,.game-scene{position:absolute;inset:0}
+.game-floor{position:absolute;left:-30%;right:-30%;bottom:0;height:56%;perspective:380px;perspective-origin:50% -10%;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,transparent 0%,#000 45%);mask-image:linear-gradient(to bottom,transparent 0%,#000 45%)}
+.game-grid{position:absolute;left:0;right:0;top:-60px;height:300%;transform-origin:50% 0;background-image:linear-gradient(rgba(244,194,27,.42) 1px,transparent 1px),linear-gradient(90deg,rgba(244,194,27,.42) 1px,transparent 1px);background-size:60px 60px;opacity:.38;transform:rotateX(64deg);animation:gridRun 3.2s linear infinite}
+@keyframes gridRun{from{transform:rotateX(64deg) translate3d(0,0,0)}to{transform:rotateX(64deg) translate3d(0,60px,0)}}
+.game-glow{position:absolute;width:480px;height:480px;left:50%;top:44%;margin:-240px 0 0 -240px;border-radius:50%;background:radial-gradient(circle,rgba(244,194,27,.42),rgba(244,194,27,.1) 40%,transparent 68%)}
+.game-orbits{position:absolute;left:50%;top:44%;width:0;height:0}
+.g-orbit{position:absolute;left:0;top:0;border-radius:50%;border:1px solid rgba(244,194,27,.2);transform:translate(-50%,-50%) scaleY(.34)}
+.g-orbit i{position:absolute;inset:0;border-radius:50%;animation:spin 9s linear infinite}
+.g-orbit i::after{content:"";position:absolute;left:50%;top:-4px;width:8px;height:8px;margin-left:-4px;border-radius:50%;background:var(--gold-hi);box-shadow:0 0 14px 3px rgba(244,194,27,.7)}
+.g-orbit-1{width:260px;height:260px}
+.g-orbit-2{width:400px;height:400px;border-color:rgba(244,194,27,.12)}
+.g-orbit-2 i{animation-duration:15s;animation-direction:reverse}
+.g-orbit-3{width:560px;height:560px;border-color:rgba(244,194,27,.07)}
+.g-orbit-3 i{animation-duration:24s}
+.game-symbol{position:absolute;left:50%;top:44%;width:150px;height:150px;margin:-75px 0 0 -75px}
+/* the float runs on a wrapper (an animated <svg> root forces layout every frame); the glow is a static gradient, not a filter */
+.star-float{position:absolute;inset:0;animation:starFloat 6s ease-in-out infinite}
+.star-halo{position:absolute;inset:-60%;border-radius:50%;background:radial-gradient(circle,rgba(255,214,90,.5) 0%,rgba(244,194,27,.18) 30%,transparent 62%)}
+.star-float svg{position:relative;width:100%;height:100%}
+@keyframes starFloat{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(8deg)}}
+.game-sparks{position:absolute;inset:0}
+.game-sparks i{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff3c4;box-shadow:0 0 10px 2px rgba(244,194,27,.7);animation:twinkle 3.4s ease-in-out infinite}
+.game-sparks i:nth-child(1){left:30%;top:28%}
+.game-sparks i:nth-child(2){left:68%;top:22%;animation-delay:.8s}
+.game-sparks i:nth-child(3){left:74%;top:58%;animation-delay:1.6s}
+.game-sparks i:nth-child(4){left:24%;top:62%;animation-delay:2.2s}
+.game-sparks i:nth-child(5){left:56%;top:14%;animation-delay:1.2s}
+@keyframes twinkle{0%,100%{opacity:.15;transform:scale(.6)}50%{opacity:1;transform:scale(1.3)}}
+.game-badge{position:absolute;z-index:2;top:26px;left:26px;padding:10px 14px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(8,9,11,.55);font:600 9.5px/1 var(--f-body);letter-spacing:.26em;color:var(--text-2)}
+.game-art-label{position:absolute;z-index:2;left:32px;bottom:28px;display:flex;flex-direction:column;font-family:var(--f-display);color:var(--text-2)}
+.game-art-label::before{content:"";position:absolute;z-index:-1;inset:-40px -60px -30px -40px;background:radial-gradient(ellipse at 30% 70%,rgba(8,9,11,.85),transparent 70%);pointer-events:none} /* quiet scrim: the grid floor never runs through the letters */
+.game-art-label .lm{display:block;overflow:hidden}
+.game-art-label .lm>*{display:block}
+.game-art-label span span{font-weight:700;font-size:13px;line-height:1.6;letter-spacing:.42em}
+.game-art-label strong{font:italic 400 clamp(64px,6.6vw,100px)/.92 var(--f-serif);letter-spacing:-.01em;color:var(--gold);padding-right:.1em}
+.game-sheen{position:absolute;z-index:3;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(255,240,190,.08) 45%,transparent 60%);transform:translateX(-100%)}
+.game-card.is-hover .game-sheen{transform:translateX(100%);transition:transform 1.4s var(--ease-out)}
+
+.game-info{position:relative;z-index:1;padding:clamp(32px,4.4vw,64px);display:flex;flex-direction:column;justify-content:center}
+.game-info h3{font-size:clamp(42px,4.2vw,68px);line-height:1;letter-spacing:-.045em;margin:24px 0 22px}
+.game-desc{color:var(--muted);line-height:1.75;font-size:15px;max-width:420px}
+.game-meta{display:grid;grid-template-columns:repeat(3,1fr);margin:34px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.game-meta>div{padding:20px 0 20px 16px;border-left:1px solid var(--line)}
+.game-meta>div:first-child{padding-left:0;border-left:0}
+.game-meta dt{font:600 9.5px/1 var(--f-body);letter-spacing:.24em;color:var(--dim);margin-bottom:10px}
+.game-meta dd{font:700 11px/1.2 var(--f-display);letter-spacing:.12em}
+.game-meta .live{display:flex;align-items:center;gap:9px;color:#d5f5e3}
+.game-info .button{min-height:62px}
+/* keyboard focus is never inside an invisible (still-scrubbing) item */
+.game-info>:focus-visible,.game-info>:focus-within{opacity:1!important;transform:none!important}
+
+/* desktop set piece (class added by JS): the art spans the whole card and is unmasked as you scroll */
+.game-card.is-cinematic{height:min(720px,calc(100svh - var(--header-h) * 2 - 20px));min-height:540px;background:var(--bg);border-color:rgb(243 241 235 / calc(.09 * var(--chrome,1)));box-shadow:none}
+/* the surface is a layer GSAP fades in (--chrome 0→1) as the aperture reaches full bleed */
+.game-card.is-cinematic::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(160deg,#121318 0%,#0c0d10 60%);opacity:var(--chrome,1);pointer-events:none}
+.game-card.is-cinematic::before{opacity:var(--chrome,1)}
+.game-card.is-cinematic .game-art{position:absolute;inset:0;z-index:0;min-height:0;border-right:0;will-change:clip-path}
+/* own layers while scrubbed, so moving the aperture never repaints the scene */
+.game-card.is-cinematic .game-art-inner,.game-card.is-cinematic .game-scene{will-change:transform}
+.game-card.is-cinematic .game-info{grid-column:2}
+
+/* 8. Studio ---------------------------------------------------------------- */
+.studio-section{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(48px,8vw,130px);align-items:center}
+.studio-image{aspect-ratio:4/5}
+.studio-layer{position:absolute;inset:-7% 0;background:var(--ground)}
+.studio-media img{width:86%;top:48%;margin:-43% 0 0 -43%}
+.image-caption{position:absolute;bottom:22px;left:26px;font:600 10px/1 var(--f-body);letter-spacing:.28em;color:var(--dim)}
+.studio-sheen{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 35%,rgba(255,240,190,.07) 48%,transparent 60%);transform:translateX(-100%)}
+.studio-image.is-hover .studio-sheen{transform:translateX(100%);transition:transform 1.4s var(--ease-out)}
+.studio-copy h2{font-size:clamp(46px,5.8vw,96px);margin-bottom:38px}
+.studio-copy>p{color:var(--muted);line-height:1.8;font-size:16px;max-width:540px}
+.studio-copy>p+p{margin-top:18px}
+.principles{position:relative;z-index:0;list-style:none;margin-top:46px;border-top:1px solid var(--line)}
+.principles li{position:relative;display:grid;grid-template-columns:56px minmax(0,.9fr) minmax(0,1.3fr) 24px;align-items:center;min-height:70px;padding:0 6px;border-bottom:1px solid var(--line);overflow:hidden}
+.principles li::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(244,194,27,.08),rgba(244,194,27,0));transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease-out)}
+.p-num{font:italic 400 20px/1 var(--f-serif);color:var(--gold);transition:transform .6s var(--ease-out)}
+.principles strong{font:800 12.5px/1 var(--f-display);letter-spacing:.22em;transition:transform .6s var(--ease-out)}
+.principles small{color:var(--muted);font-size:14px;transition:color .5s}
+.p-arrow{color:var(--gold);opacity:.35;transition:transform .6s var(--ease-out),opacity .6s}
+@media (hover:hover){
+  .principles li:hover::before{transform:scaleX(1)}
+  .principles li:hover .p-num{transform:translateX(6px)}
+  .principles li:hover strong{transform:translateX(10px)}
+  .principles li:hover small{color:var(--text-2)}
+  .principles li:hover .p-arrow{opacity:1;transform:translateX(4px)}
+}
+
+/* 9. Quote ----------------------------------------------------------------- */
+.quote-section{position:relative;isolation:isolate;max-width:1240px;margin:0 auto;padding:clamp(30px,5vw,70px) var(--gutter) clamp(60px,7vw,110px);text-align:center}
+.quote-glow{position:absolute;z-index:-1;left:50%;top:45%;width:min(90vw,900px);height:420px;transform:translate(-50%,-50%);background:radial-gradient(ellipse at center,rgba(244,194,27,.08),transparent 65%);pointer-events:none}
+.quote-section blockquote{font:800 clamp(38px,6.6vw,108px)/.96 var(--f-display);letter-spacing:-.05em;word-spacing:.06em;margin:clamp(40px,5vw,64px) 0;text-wrap:balance}
+.quote-section blockquote em{font-size:1.1em}
+.quote-section .q{font-family:var(--f-serif);font-weight:400;color:var(--gold);font-size:1.1em;letter-spacing:0}
+.quote-section .q-open{margin-left:-.42em} /* hung, so the block centres optically */
+.nowrap{white-space:nowrap}
+.quote-line{height:1px;background:linear-gradient(90deg,transparent,rgba(244,194,27,.4),transparent)}
+
+/* 10. Contact -------------------------------------------------------------- */
+.contact-section{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);gap:clamp(30px,3vw,48px) 60px;align-items:end;padding-bottom:clamp(60px,7vw,110px)}
+.contact-section::before{content:"";position:absolute;top:0;left:var(--gutter);right:var(--gutter);height:1px;background:var(--line)} /* the rule stops at the content edges like every other divider */
+.quote-section+.contact-section::before{display:none} /* the quote's gold hairline already closes the motto */
+.contact-head{grid-column:1/-1}
+.contact-card{grid-column:2}
+.contact-head h2{font-size:clamp(56px,11vw,190px);line-height:.86}
+.contact-head h2 em{font-size:1.1em}
+.contact-card{position:relative;padding-bottom:14px}
+.contact-card>p{color:var(--muted);line-height:1.7;font-size:16px;max-width:340px}
+.contact-email{position:relative;display:inline-flex;align-items:baseline;gap:14px;max-width:100%;min-height:44px;margin:18px 0 0;padding:8px 0 14px;font:700 min(clamp(19px,2.3vw,34px),5.6vw)/1.2 var(--f-display);letter-spacing:-.02em;white-space:nowrap;transition:color .4s var(--ease-out)}
+.contact-email-arrow{flex:none;color:var(--gold);transition:transform .6s var(--ease-out)}
+.contact-email-line{position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(244,194,27,.4);overflow:hidden}
+.contact-email-line::after{content:"";position:absolute;inset:0;background:var(--gold-hi);transform:scaleX(0);transform-origin:right;transition:transform .8s var(--ease-out)}
+@media (hover:hover){
+  .contact-email:hover{color:var(--gold-hi)}
+  .contact-email:hover .contact-email-arrow{transform:translate(4px,-4px)}
+  .contact-email:hover .contact-email-line::after{transform:scaleX(1);transform-origin:left}
+}
+
+/* 11. Footer finale -------------------------------------------------------- */
+.site-footer{position:relative;width:100%;max-width:calc(var(--max) + var(--gutter) * 2);margin:0 auto;padding:0 var(--gutter)}
+.footer-top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:26px 0;border-top:1px solid var(--line)}
+.footer-brand{display:flex;align-items:center;gap:12px;font:800 11px/1 var(--f-display);letter-spacing:.3em;color:var(--text-2)}
+.footer-brand img{width:30px;height:30px;border-radius:50%;object-fit:cover;filter:contrast(1.35)}
+.footer-top-link,.footer-bottom a{display:inline-flex;align-items:center;gap:8px;min-height:44px;font:600 11px/1 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--text-2);transition:color .4s}
+@media (hover:hover){.footer-top-link:hover,.footer-bottom a:hover{color:var(--gold)}}
+
+/* sunrise horizon: a gold sun on a hairline horizon, a grid floor below, the wordmark rising out of it.
+   The horizon line sits at --hz from the top of the stage; the wordmark's mask ends exactly there. */
+.horizon{--hz:62%;position:relative;left:50%;width:100vw;margin-left:-50vw;height:clamp(250px,34vw,560px);overflow:hidden;pointer-events:none;user-select:none;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 16%);mask-image:linear-gradient(180deg,transparent 0,#000 16%)} /* feathered top: the sun's glow never ends on a hard edge */
+.horizon-sun{--d:min(1300px,150vw);position:absolute;left:50%;top:var(--hz);width:var(--d);aspect-ratio:1;margin:calc(var(--d) / -2) 0 0 calc(var(--d) / -2);border-radius:50%;background:radial-gradient(circle,rgba(255,226,140,.34) 0%,rgba(244,194,27,.15) 14%,rgba(244,194,27,.05) 32%,transparent 58%);-webkit-mask-image:linear-gradient(180deg,#000 50%,rgba(0,0,0,.28) 50%);mask-image:linear-gradient(180deg,#000 50%,rgba(0,0,0,.28) 50%)}
+.horizon-floor{position:absolute;left:-15%;right:-15%;top:var(--hz);bottom:0;perspective:420px;perspective-origin:50% 0;overflow:hidden;
+  /* vertical fade × horizontal fade: the steep far-off diagonals (which alias) never render */
+  -webkit-mask-image:linear-gradient(90deg,transparent 8%,#000 34%,#000 66%,transparent 92%),linear-gradient(180deg,rgba(0,0,0,.9),#000 30%,transparent 100%);-webkit-mask-composite:source-in;
+  mask-image:linear-gradient(90deg,transparent 8%,#000 34%,#000 66%,transparent 92%),linear-gradient(180deg,rgba(0,0,0,.9),#000 30%,transparent 100%);mask-composite:intersect}
+.horizon-grid{position:absolute;left:0;right:0;top:0;height:900px;transform-origin:50% 0;background-image:linear-gradient(rgba(244,194,27,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(244,194,27,.5) 1px,transparent 1px);background-size:72px 72px;background-position:center top;opacity:.4;transform:rotateX(76deg);animation:floorRun 3s linear infinite}
+@keyframes floorRun{from{transform:rotateX(76deg) translate3d(0,0,0)}to{transform:rotateX(76deg) translate3d(0,72px,0)}}
+.horizon-line{position:absolute;left:0;right:0;top:var(--hz);height:1px;background:linear-gradient(90deg,transparent 6%,rgba(244,194,27,.25) 28%,rgba(255,226,130,.9) 50%,rgba(244,194,27,.25) 72%,transparent 94%)}
+.footer-word{position:absolute;left:0;right:0;top:0;height:var(--hz);display:flex;justify-content:center;align-items:flex-end;overflow:hidden;font:800 clamp(80px,21vw,330px)/.78 var(--f-display);letter-spacing:-.06em}
+.footer-word{opacity:.8}
+.footer-word span{display:block;padding:0 .01em;background:linear-gradient(180deg,#ffe9a8 0%,#f4c21b 34%,#9a6f07 70%,rgba(154,111,7,0) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.footer-bottom{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0 30px;border-top:1px solid var(--line);font:400 12px/1.5 var(--f-body);letter-spacing:.06em;color:var(--dim)}
+.footer-actions{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+/* pause-motion toggle: a quiet footer control, gold when motion is paused */
+.motion-toggle{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0;border:0;background:none;cursor:pointer;font:600 11px/1 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--text-2);transition:color .4s}
+.motion-toggle[hidden]{display:none}
+.motion-toggle-icon{position:relative;width:9px;height:10px;flex:none;border-left:2px solid currentColor;border-right:2px solid currentColor;transition:border-width .3s var(--ease-out)}
+.motion-toggle[aria-pressed="true"]{color:var(--gold)}
+.motion-toggle .mt-on,.motion-toggle[aria-pressed="true"] .mt-off{display:none}
+.motion-toggle[aria-pressed="true"] .mt-on{display:inline-block}
+.motion-toggle[aria-pressed="true"] .motion-toggle-icon{border-right-width:0;border-left-width:9px;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left-color:currentColor;height:0}
+@media (hover:hover){.motion-toggle:hover{color:var(--gold)}}
+html.paused *,html.paused *::before,html.paused *::after{animation-play-state:paused!important}
+/* …except the intro curtain, which must always finish lifting */
+html.paused .intro,html.paused .intro *{animation-play-state:running!important}
+
+/* 12. Cursor (fine pointers only, created by JS) --------------------------- */
+.cursor{position:fixed;left:0;top:0;z-index:250;pointer-events:none;opacity:0;transition:opacity .3s}
+html.cursor-on .cursor{opacity:1}
+html.cursor-on .cursor.is-away{opacity:0}
+/* GSAP moves the wrappers; CSS only ever scales the inner <i> (never transition a GSAP-driven transform) */
+.cursor-dot,.cursor-ring{position:fixed;left:0;top:0}
+.cursor-dot i{display:block;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:var(--gold);transition:transform .35s var(--ease-out)}
+.cursor-ring i{display:block;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:1px solid rgba(243,241,235,.38);transition:transform .55s var(--ease-out),background-color .4s,border-color .4s}
+/* contextual tag: a small chip trailing beside the ring, never covering what you point at */
+.cursor-label{position:absolute;left:38px;top:34px;padding:8px 13px 8px 11px;border-radius:999px;background:var(--gold);color:#0b0b0c;font:600 10px/1 var(--f-body);letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;opacity:0;transform:scale(.6) translateY(6px);transform-origin:0 0;transition:opacity .3s,transform .5s var(--ease-out);box-shadow:0 10px 30px -10px rgba(244,194,27,.6)}
+.cursor-label::before{content:"↗ "}
+/* near the right / bottom edges the chip trails on the other side, so it is never cut off */
+.cursor.flip-x .cursor-label{left:auto;right:38px;transform-origin:100% 0}
+.cursor.flip-y .cursor-label{top:auto;bottom:34px}
+.cursor.flip-y:not(.flip-x) .cursor-label{transform-origin:0 100%}
+.cursor.flip-x.flip-y .cursor-label{transform-origin:100% 100%}
+.cursor.is-link .cursor-ring i,.cursor.is-label .cursor-ring i{transform:scale(1.55);border-color:rgba(244,194,27,.75);background-color:rgba(244,194,27,.07)}
+.cursor.is-link .cursor-dot i,.cursor.is-label .cursor-dot i{transform:scale(.5)}
+.cursor.is-label .cursor-label{opacity:1;transform:none}
+.cursor.is-down .cursor-ring i{transform:scale(.8)}
+html.cursor-on,html.cursor-on *{cursor:none!important}
+/* High Contrast users keep their own system cursor */
+@media (forced-colors:active){.cursor{display:none}html.cursor-on,html.cursor-on *{cursor:auto!important}}
+
+/* 13. Intro curtain (first visit, pure CSS so its clock starts at first paint) ----
+   ~0.9s of mark + word, then a 0.72s lift. script.js starts the hero on the lift. */
+.intro{display:none}
+html.show-intro:not(.no-anim) .intro{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;background:radial-gradient(circle at 50% 46%,#16130a 0%,var(--bg) 55%);animation:introOut .72s var(--ease-io) .9s forwards}
+.intro-mark{position:relative;width:112px;height:112px;display:grid;place-items:center;border-radius:50%}
+.intro-ring{position:absolute;inset:-14px;width:calc(100% + 28px);max-width:none;height:calc(100% + 28px);transform:rotate(-90deg)}
+.intro-ring circle{fill:none;stroke:var(--gold);stroke-width:1.2;stroke-dasharray:365;stroke-dashoffset:365;animation:ringDraw .95s var(--ease-io) .05s forwards}
+.intro-mark img{width:100%;max-width:none;height:100%;object-fit:cover;-webkit-mask-image:radial-gradient(circle,#000 58%,transparent 70%);mask-image:radial-gradient(circle,#000 58%,transparent 70%);filter:contrast(1.7) brightness(.85);mix-blend-mode:screen;transform:scale(.9);animation:introPop 1s var(--ease-out) forwards} /* visible from frame 1 so the browser gets a contentful first paint */
+.intro-word{display:flex;gap:.5em;overflow:hidden;font:800 14px/1.3 var(--f-display);letter-spacing:.1em;padding-left:.5em}
+.intro-word span{display:block;transform:translateY(110%);animation:introRise .7s var(--ease-out) forwards}
+.intro-word span:nth-child(1){animation-delay:.18s}.intro-word span:nth-child(2){animation-delay:.22s}.intro-word span:nth-child(3){animation-delay:.26s}.intro-word span:nth-child(4){animation-delay:.30s}.intro-word span:nth-child(5){animation-delay:.34s}.intro-word span:nth-child(6){animation-delay:.38s}.intro-word span:nth-child(7){animation-delay:.42s}
+.intro-meta{font:italic 400 17px/1 var(--f-serif);letter-spacing:.02em;color:var(--gold);opacity:0;animation:introFade .6s ease .45s forwards}
+@keyframes ringDraw{to{stroke-dashoffset:0}}
+@keyframes introPop{to{transform:none}}
+@keyframes introRise{to{transform:none}}
+@keyframes introFade{to{opacity:1}}
+@keyframes introOut{0%{clip-path:inset(0 0 0 0)}99%{clip-path:inset(0 0 100% 0);visibility:visible}100%{clip-path:inset(0 0 100% 0);visibility:hidden}}
+
+/* 14. Motion states — only ever hidden when JS + motion are on, and never after .no-anim.
+   Everything hides with opacity only, so links inside stay keyboard-focusable. */
+html.motion:not(.no-anim) [data-hero],
+html.motion:not(.no-anim) [data-reveal],
+html.motion:not(.no-anim) [data-split],
+html.motion:not(.no-anim) [data-lines],
+html.motion:not(.no-anim) .site-header>.brand,
+html.motion:not(.no-anim) .site-header>.menu-toggle,
+html.motion:not(.no-anim) .site-header>.nav,
+html.motion:not(.no-anim) .hero-dust{opacity:0}
+html.motion:not(.no-anim) [data-line]{transform:scaleX(0)}
+html.motion:not(.no-anim) [data-principles] li::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,var(--gold),rgba(244,194,27,0));transform:scaleX(0);transform-origin:left;transition:transform 1.2s var(--ease-out) calc(var(--i) * .12s)}
+html.motion:not(.no-anim) [data-principles].is-in li::after{transform:scaleX(1)}
+html.motion:not(.no-anim) [data-principles] li>*{opacity:0;transform:translateY(14px);transition:opacity .9s var(--ease-out) calc(.1s + var(--i) * .1s),transform .9s var(--ease-out) calc(.1s + var(--i) * .1s)}
+html.motion:not(.no-anim) [data-principles].is-in li>*{opacity:1;transform:none}
+@media (hover:hover){ /* hover transforms still win once revealed */
+  html.motion:not(.no-anim) [data-principles].is-in li:hover .p-num{transform:translateX(6px);transition-delay:0s}
+  html.motion:not(.no-anim) [data-principles].is-in li:hover strong{transform:translateX(10px);transition-delay:0s}
+  html.motion:not(.no-anim) [data-principles].is-in li:hover .p-arrow{transform:translateX(4px);transition-delay:0s}
+}
+/* the JS-driven marquee replaces the CSS loop */
+html.marquee-js .ticker-track{animation:none}
+/* off-screen sections pause every CSS loop (toggled per section by script.js) */
+html.motion .is-idle,html.motion .is-idle *,html.motion .is-idle *::before,html.motion .is-idle *::after{animation-play-state:paused!important}
+
+/* 15. Responsive ----------------------------------------------------------- */
+@media (max-width:1100px){
+  .game-card{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .frame-cap{display:none}
+}
+@media (max-width:850px){
+  :root{--header-h:68px}
+  /* mobile menu: the same <nav> becomes a full-screen sheet that irises open from the toggle */
+  .menu-toggle{position:relative;z-index:2;display:inline-flex;align-items:center;gap:12px;min-height:48px;padding:0 6px 0 16px;border-radius:999px;border:1px solid var(--line-2);background:rgba(8,9,11,.6);cursor:pointer;-webkit-tap-highlight-color:transparent;font:700 10px/1 var(--f-display);letter-spacing:.2em;text-transform:uppercase}
+  .menu-toggle-text{display:block;height:1.3em;overflow:hidden}
+  .menu-toggle-text span{display:block;line-height:1.3;transition:transform .7s var(--ease-out)}
+  .menu-open .menu-toggle-text span{transform:translateY(-100%)}
+  .menu-toggle-lines{position:relative;display:block;width:34px;height:34px;border-radius:50%;background:var(--gold)}
+  .menu-toggle-lines span{position:absolute;left:10px;width:14px;height:1.5px;border-radius:2px;background:#0b0b0c;transition:transform .6s var(--ease-out),top .6s var(--ease-out)}
+  .menu-toggle-lines span:first-child{top:13.5px}
+  .menu-toggle-lines span:last-child{top:19px}
+  .menu-open .menu-toggle{border-color:rgba(244,194,27,.5)}
+  .menu-open .menu-toggle-lines span:first-child{top:16.25px;transform:rotate(45deg)}
+  .menu-open .menu-toggle-lines span:last-child{top:16.25px;transform:rotate(-45deg)}
+
+  /* flex-start + the auto margins on kicker/foot: centred when it fits, scrollable from the top when it doesn't */
+  .nav{position:fixed;inset:0;z-index:1;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;overscroll-behavior:contain;padding:calc(var(--header-h) + 24px) var(--gutter) 34px;background:radial-gradient(circle at 100% 0%,rgba(244,194,27,.14),transparent 52%),var(--bg);clip-path:circle(0px at calc(100% - var(--gutter) - 24px) calc(var(--header-h) / 2));visibility:hidden;transition:clip-path .7s cubic-bezier(.33,1,.68,1),visibility 0s linear .7s;overflow-y:auto}
+  .menu-open .nav{clip-path:circle(160% at calc(100% - var(--gutter) - 24px) calc(var(--header-h) / 2));visibility:visible;transition:clip-path .8s cubic-bezier(.6,0,.2,1),visibility 0s}
+  .nav-kicker,.nav-foot{opacity:0;transition:opacity .35s var(--ease-out)}
+  .menu-open :is(.nav-kicker,.nav-foot){opacity:1;transition:opacity .8s var(--ease-out) .3s}
+  .nav-kicker{display:block;margin:auto 0 18px;font:600 11px/1 var(--f-body);letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+  .nav-list{flex-direction:column;align-items:stretch;gap:0;border-top:1px solid var(--line)}
+  .nav-list li{opacity:0;transform:translateY(46px);transition:opacity .35s var(--ease-out),transform .5s var(--ease-out)}
+  .menu-open .nav-list li{opacity:1;transform:none;transition:opacity .9s var(--ease-out) calc(.2s + var(--i) * .07s),transform .9s var(--ease-out) calc(.2s + var(--i) * .07s)}
+  .nav-link{align-items:center;gap:18px;padding:20px 0;font:800 clamp(40px,12vw,64px)/1 var(--f-display);letter-spacing:-.045em;text-transform:none;color:var(--text);border-bottom:1px solid var(--line)}
+  .nav-link::after{display:none}
+  .nav-num{font-size:18px;width:28px;opacity:1;transform:translateY(-.7em)}
+  .nav-cta{justify-content:space-between;min-height:60px;margin-top:34px;padding:0 8px 0 24px;opacity:0;transform:translateY(30px);transition:opacity .35s var(--ease-out),transform .5s var(--ease-out),color .45s,border-color .45s}
+  .nav-cta-icon{width:44px;height:44px}
+  .menu-open .nav-cta{opacity:1;transform:none;transition:opacity .9s var(--ease-out) .45s,transform .9s var(--ease-out) .45s}
+  .nav-foot{display:flex;justify-content:space-between;margin-top:auto;padding-top:28px;font:600 10px/1 var(--f-body);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+  html.menu-open,html.menu-open body{overflow:hidden}
+
+  .hero{padding-top:calc(var(--header-h) + 22px);min-height:max(100svh,640px)}
+  /* tablet: title beside the frame; phones (below) put it underneath */
+  .hero-inner{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"eyebrow frame" "title frame" "copy copy" "actions actions";align-content:center;column-gap:24px;padding:16px 0 40px}
+  .hero-frame{width:clamp(120px,29vw,240px);aspect-ratio:4/5;align-self:start}
+  .hero-eyebrow{align-self:start;align-items:flex-start;line-height:1.7}
+  .hero-eyebrow .eyebrow-line{margin-top:.8em}
+  .hero-title{font-size:clamp(50px,8.8vw,84px);margin:24px 0 0;align-self:end}
+  .hero-copy{font-size:16px;max-width:520px;margin-top:30px}
+  .hero-actions{margin-top:30px}
+  .hero-glow{right:-40%;top:22%}
+  .hero-live{background:rgba(10,11,13,.85)}
+  .section-heading{display:block}
+  .section-intro{margin-top:26px;max-width:420px}
+  .game-card{grid-template-columns:1fr;border-radius:20px}
+  .game-art{min-height:440px;border-right:0;border-bottom:1px solid var(--line)}
+  .studio-section{grid-template-columns:1fr}
+  .studio-image{max-width:520px;width:100%}
+  .studio-copy h2{font-size:clamp(46px,9.5vw,84px)}
+  .contact-section{grid-template-columns:1fr;gap:34px}
+  .contact-card{grid-column:1}
+}
+@media (max-width:560px){
+  :root{--gutter:20px}
+  .brand{gap:12px;letter-spacing:.26em}
+  .brand-mark{width:36px;height:36px}
+  .hero-inner{grid-template-areas:"eyebrow frame" "title title" "copy copy" "actions actions";align-content:start;column-gap:16px}
+  .hero-frame{width:clamp(112px,34vw,170px)}
+  .hero-eyebrow{align-self:center;font-size:10px;letter-spacing:.22em;gap:10px}
+  .hero-eyebrow .eyebrow-line{width:22px}
+  .hero-title{font-size:clamp(42px,12.9vw,60px);margin-top:26px}
+  .hero-copy{font-size:15px;margin-top:22px}
+  .hero-actions{display:grid;grid-template-columns:1fr;margin-top:26px}
+  .hero-actions .button{width:100%;justify-content:space-between}
+  .hero-actions .button-ghost{justify-content:center}
+  .hero-foot{padding:16px 0 20px}
+  .hero-live{padding:0 14px;font-size:10px;letter-spacing:.1em}
+  .hero-live-sep,.hero-live-muted{display:none}
+  .scroll-note{font-size:9px;gap:12px}
+  .scroll-line{width:32px}
+  .game-art{min-height:390px}
+  .game-symbol{transform:scale(.8)}
+  .g-orbit-3{display:none}
+  .game-art-label{left:22px;bottom:20px}
+  .game-badge{top:20px;left:20px}
+  .game-info{padding:32px 22px 24px}
+  .game-meta{grid-template-columns:1fr}
+  .game-meta>div{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-left:0;border-top:1px solid var(--line)}
+  .game-meta>div:first-child{border-top:0}
+  .game-meta dt{margin:0}
+  .game-info .button{padding:0 22px;letter-spacing:.12em}
+  .principles li{grid-template-columns:40px minmax(0,1fr) 20px;grid-template-rows:auto auto;padding:16px 0;row-gap:6px}
+  .principles small{grid-column:2;grid-row:2;font-size:13px}
+  .p-arrow{grid-column:3;grid-row:1/3}
+  .footer-top{padding:20px 0}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:4px}
+}
+@media (max-width:850px) and (max-height:700px){.hero-frame{width:clamp(100px,26vw,160px)}}
+/* tablet portrait: the studio still becomes a full-width landscape plate instead of a narrow left-hugging card */
+@media (min-width:561px) and (max-width:850px){
+  .studio-image{max-width:none;aspect-ratio:16/11}
+  .studio-media img{width:62%;margin:-31% 0 0 -31%}
+}
+/* landscape phones: a tighter menu sheet so everything fits (and the rest scrolls) */
+@media (max-width:850px) and (max-height:520px){
+  .nav{padding-top:calc(var(--header-h) + 8px)}
+  .nav-kicker{display:none}
+  .nav-link{font-size:clamp(28px,9vh,40px);padding:10px 0}
+  .nav-cta{margin-top:16px}
+  .nav-foot{padding-top:16px}
+}
+/* 360–400px phones: keep the hero's bottom row on one line */
+@media (max-width:400px){
+  .scroll-line{display:none}
+  .scroll-note{letter-spacing:.2em}
+  .scroll-note,.hero-live{white-space:nowrap}
+}
+/* touch: a designed press state instead of the browser's grey tap box */
+a,button{-webkit-tap-highlight-color:transparent}
+@media (hover:none){
+  .button,.nav-cta,.hero-live,.contact-email,.motion-toggle{transition:transform .2s var(--ease-out),color .3s,border-color .3s,background-color .3s}
+  .button:active,.nav-cta:active,.hero-live:active{transform:scale(.97)}
+  .button:active .button-fill{transform:translate(-50%,-50%) scale(1);transition-duration:.3s}
+  .button-ghost:active{color:#0b0b0c}
+  .hero-live:active{border-color:rgba(244,194,27,.45);background:rgba(244,194,27,.06)}
+  .contact-email:active,.motion-toggle:active,.footer-top-link:active,.footer-bottom a:active{color:var(--gold-hi)}
+}
+
+/* 16. No-JS + reduced motion ----------------------------------------------- */
+/* without JS (or if script.js never booted: .no-anim without .ready) the mobile toggle
+   can't work, so the links simply sit in the header */
+@media (max-width:850px){
+  :is(html:not(.js),html.no-anim:not(.ready)) .menu-toggle{display:none}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav{position:static;clip-path:none;visibility:visible;transition:none;background:none;padding:0;flex-direction:row;overflow:visible}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav-list{flex-direction:row;border:0}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav-list li{opacity:1;transform:none}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav-link{min-height:44px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:14px 6px;border:0}
+  :is(html:not(.js),html.no-anim:not(.ready)) :is(.nav-num,.nav-cta,.nav-kicker,.nav-foot,.brand-word){display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
+  .roll-clone{display:none}
+  .roll .ch{transform:none!important}
+  .live-dot::after{display:none}
+  .ticker-track{animation:none}
+  .intro{display:none!important}
 }

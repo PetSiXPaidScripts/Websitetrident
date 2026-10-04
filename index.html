@@ -3,140 +3,300 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#090a0c">
+  <meta name="theme-color" content="#07080a">
   <meta name="description" content="Trident — an independent game development studio creating bold, memorable Roblox experiences.">
   <title>Trident — Game Development Studio</title>
+  <link rel="icon" href="assets/trident-logo.jpeg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="assets/trident-logo.jpeg">
+
+  <!--
+    Progressive-enhancement switches (run before first paint):
+      .js         scripting is on
+      .motion     the visitor has NOT asked for reduced motion → hide-before-reveal styles apply
+      .show-intro first visit in this tab session → the short intro curtain plays
+      .no-anim    safety net: if script.js fails to load or has not booted after 1.5s, everything is shown
+  -->
+  <script>
+    (function (d) {
+      var h = d.documentElement;
+      h.classList.add('js');
+      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduce) {
+        h.classList.add('motion');
+        try {
+          // a visitor who paused motion (remembered on this device) never gets the curtain either
+          var paused = false;
+          try { paused = localStorage.getItem('trd-paused') === '1'; } catch (e) { /* storage blocked */ }
+          if (!paused && !sessionStorage.getItem('trd-intro')) { h.classList.add('show-intro'); sessionStorage.setItem('trd-intro', '1'); }
+        } catch (e) { /* storage blocked: skip the intro */ }
+      }
+      setTimeout(function () { if (!h.classList.contains('ready')) h.classList.add('no-anim'); }, 1500);
+    })(document);
+  </script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Manrope (display) · Instrument Serif italic (accents) · DM Sans (body). Non-blocking; the intro covers the swap. -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&amp;family=Instrument+Serif:ital@0;1&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&amp;family=Instrument+Serif:ital@0;1&amp;family=Manrope:wght@500;600;700;800&amp;display=swap"></noscript>
+  <link rel="stylesheet" href="assets/vendor/lenis.css">
   <link rel="stylesheet" href="styles.css">
+
+  <script src="assets/vendor/gsap.min.js" defer onerror="document.documentElement.classList.add('no-anim')"></script>
+  <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="assets/vendor/SplitText.min.js" defer></script>
+  <script src="assets/vendor/CustomEase.min.js" defer></script>
+  <script src="assets/vendor/lenis.min.js" defer></script>
+  <script src="script.js" defer onerror="document.documentElement.classList.add('no-anim')"></script>
 </head>
 <body>
-  <div class="cursor-glow" aria-hidden="true"></div>
+  <a class="skip-link" href="#top">Skip to content</a>
 
-  <header class="site-header">
+  <!-- Intro curtain: first visit only, ≈1.75s, timed by CSS from first paint -->
+  <div class="intro" aria-hidden="true">
+    <div class="intro-mark">
+      <svg class="intro-ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58"/></svg>
+      <img src="assets/trident-logo.jpeg" alt="">
+    </div>
+    <p class="intro-word"><span>T</span><span>R</span><span>I</span><span>D</span><span>E</span><span>N</span><span>T</span></p>
+    <p class="intro-meta">Independent game studio</p>
+  </div>
+
+  <!-- ============================== HEADER ============================== -->
+  <header class="site-header" data-header>
+    <div class="header-glass" aria-hidden="true"><span class="header-progress"></span></div>
+
     <a class="brand" href="#top" aria-label="Trident home">
-      <img src="assets/trident-logo.jpeg" alt="Trident logo">
-      <span>TRIDENT</span>
+      <span class="brand-mark"><img src="assets/trident-logo.jpeg" alt="Trident logo" width="40" height="40"></span>
+      <span class="brand-word">TRIDENT</span>
     </a>
 
-    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false">
-      <span></span><span></span>
-    </button>
-
-    <nav class="nav" aria-label="Main navigation">
-      <a href="#games">Games</a>
-      <a href="#studio">Studio</a>
-      <a href="#contact">Contact</a>
-      <a class="nav-cta" href="https://www.roblox.com/games/93776169505376/happy-pet-game" target="_blank" rel="noopener">Play our game ↗</a>
+    <nav class="nav" id="site-nav" aria-label="Main navigation" data-lenis-prevent>
+      <p class="nav-kicker" aria-hidden="true">Menu</p>
+      <ul class="nav-list">
+        <li style="--i:0"><a class="nav-link" href="#games"><span class="nav-num" aria-hidden="true">01</span><span class="roll" data-roll>Games</span></a></li>
+        <li style="--i:1"><a class="nav-link" href="#studio"><span class="nav-num" aria-hidden="true">02</span><span class="roll" data-roll>Studio</span></a></li>
+        <li style="--i:2"><a class="nav-link" href="#contact"><span class="nav-num" aria-hidden="true">03</span><span class="roll" data-roll>Contact</span></a></li>
+      </ul>
+      <a class="nav-cta" href="https://www.roblox.com/games/93776169505376/happy-pet-game" target="_blank" rel="noopener" data-magnetic="soft">
+        <span class="nav-cta-fill" aria-hidden="true"></span>
+        <span class="roll" data-roll>Play our game</span>
+        <span class="nav-cta-icon" aria-hidden="true">↗</span>
+      </a>
+      <div class="nav-foot" aria-hidden="true">
+        <span>Trident Studio</span>
+        <span>Roblox experiences</span>
+      </div>
     </nav>
+
+    <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+      <span class="menu-toggle-text" aria-hidden="true"><span>Menu</span><span>Close</span></span>
+      <span class="menu-toggle-lines" aria-hidden="true"><span></span><span></span></span>
+    </button>
   </header>
 
   <main id="top">
-    <section class="hero">
-      <div class="hero-orbit orbit-one"></div>
-      <div class="hero-orbit orbit-two"></div>
-      <div class="hero-content reveal">
-        <p class="eyebrow"><span></span> INDEPENDENT GAME STUDIO</p>
-        <h1>WE BUILD WORLDS<br><em>WORTH PLAYING.</em></h1>
-        <p class="hero-copy">
+    <!-- ============================== HERO ============================== -->
+    <section class="hero" aria-labelledby="hero-title">
+      <canvas class="hero-dust" aria-hidden="true"></canvas>
+      <div class="hero-bg" aria-hidden="true">
+        <span class="hero-glow"></span>
+        <span class="hero-rule rule-a"></span>
+        <span class="hero-rule rule-b"></span>
+      </div>
+
+      <div class="hero-inner">
+        <p class="eyebrow hero-eyebrow" data-hero="fade"><span class="eyebrow-line"></span> INDEPENDENT GAME STUDIO</p>
+        <h1 id="hero-title" class="hero-title" data-hero="title">WE BUILD WORLDS <br><em>WORTH PLAYING.</em></h1>
+        <p class="hero-copy" data-hero="lines">
           Trident is a game development studio focused on creating polished,
           social experiences with personality, progression, and a little bit of chaos.
         </p>
-        <div class="hero-actions">
-          <a class="button button-primary" href="#games">Explore our games <span>↓</span></a>
-          <a class="button button-ghost" href="#studio">About Trident</a>
+        <div class="hero-actions" data-hero="fade">
+          <a class="button button-primary" href="#games" data-magnetic>
+            <span class="button-fill" aria-hidden="true"></span>
+            <span class="roll" data-roll>Explore our games</span>
+            <span class="button-icon" aria-hidden="true">↓</span>
+          </a>
+          <a class="button button-ghost" href="#studio" data-magnetic>
+            <span class="button-fill" aria-hidden="true"></span>
+            <span class="roll" data-roll>About Trident</span>
+          </a>
         </div>
-      </div>
 
-      <div class="hero-mark reveal">
-        <div class="mark-ring"></div>
-        <img src="assets/trident-logo.jpeg" alt="" aria-hidden="true">
-      </div>
-
-      <div class="scroll-note">SCROLL TO EXPLORE <span>↓</span></div>
-    </section>
-
-    <section class="ticker" aria-label="Trident statement">
-      <div>GAMES <span>✦</span> COMMUNITY <span>✦</span> CRAFT <span>✦</span> GAMES <span>✦</span> COMMUNITY <span>✦</span> CRAFT <span>✦</span></div>
-    </section>
-
-    <section id="games" class="section games-section">
-      <div class="section-heading reveal">
-        <div>
-          <p class="eyebrow"><span></span> SELECTED WORK</p>
-          <h2>OUR <em>LATEST</em><br>ADVENTURE.</h2>
-        </div>
-        <p class="section-intro">One world at a time. Our newest experience is live on Roblox now.</p>
-      </div>
-
-      <article class="game-card reveal">
-        <div class="game-art">
-          <div class="game-grid"></div>
-          <div class="game-glow"></div>
-          <div class="game-badge">TRIDENT ORIGINAL</div>
-          <div class="game-symbol">✦</div>
-          <div class="game-art-label">HAPPY<br><strong>PET</strong><br>GAME</div>
-        </div>
-        <div class="game-info">
-          <p class="eyebrow"><span></span> NOW LIVE ON ROBLOX</p>
-          <h3>Happy Pet Game</h3>
-          <p>Collect, grow, explore, and build your own little pet-filled world. A cozy progression experience made for players who like to chase the next unlock.</p>
-          <div class="game-meta">
-            <div><small>PLATFORM</small><strong>ROBLOX</strong></div>
-            <div><small>GENRE</small><strong>COLLECT · SIM</strong></div>
-            <div><small>STATUS</small><strong class="live">● LIVE</strong></div>
+        <!-- framed still: the logo's grey ground is dissolved into a gold glow (contrast + screen blend) -->
+        <div class="hero-frame frame" aria-hidden="true" data-hero="frame">
+          <div class="frame-media" data-frame-media>
+            <span class="frame-glow"></span>
+            <span class="frame-orbit"></span>
+            <img src="assets/trident-logo.jpeg" alt="">
           </div>
-          <a class="button button-primary wide" href="https://www.roblox.com/games/93776169505376/happy-pet-game" target="_blank" rel="noopener">PLAY HAPPY PET GAME <span>↗</span></a>
+          <span class="frame-ticks"><i></i><i></i><i></i><i></i></span>
+          <span class="frame-cap">Trident <em>✦</em> Roblox experiences</span>
         </div>
-      </article>
+      </div>
+
+      <div class="hero-foot" data-hero="fade">
+        <div class="scroll-note">SCROLL TO EXPLORE <span class="scroll-line" aria-hidden="true"></span></div>
+        <a class="hero-live" href="#games"><span class="live-dot" aria-hidden="true"></span> Happy Pet Game <span class="hero-live-sep" aria-hidden="true">—</span> <span class="hero-live-muted">Now live on Roblox</span></a>
+      </div>
     </section>
 
+    <!-- ============================== TICKER ============================== -->
+    <section class="ticker" aria-label="Trident statement">
+      <div class="ticker-track" data-marquee>
+        <p class="ticker-group">GAMES <span class="tk-star" aria-hidden="true">✦</span> <em>COMMUNITY</em> <span class="tk-star" aria-hidden="true">✦</span> CRAFT <span class="tk-star" aria-hidden="true">✦</span> GAMES <span class="tk-star" aria-hidden="true">✦</span> <em>COMMUNITY</em> <span class="tk-star" aria-hidden="true">✦</span> CRAFT <span class="tk-star" aria-hidden="true">✦</span></p>
+        <p class="ticker-group" aria-hidden="true">GAMES <span class="tk-star">✦</span> <em>COMMUNITY</em> <span class="tk-star">✦</span> CRAFT <span class="tk-star">✦</span> GAMES <span class="tk-star">✦</span> <em>COMMUNITY</em> <span class="tk-star">✦</span> CRAFT <span class="tk-star">✦</span></p>
+      </div>
+    </section>
+
+    <!-- ============================== GAMES ============================== -->
+    <section id="games" class="section games-section">
+      <div class="section-heading">
+        <div>
+          <div class="section-meta" data-reveal="meta">
+            <p class="eyebrow"><span class="eyebrow-line"></span> SELECTED WORK</p>
+            <span class="section-num" aria-hidden="true">(01)</span>
+          </div>
+          <h2 data-split>OUR <em>LATEST</em> <br>ADVENTURE.</h2>
+        </div>
+        <p class="section-intro" data-lines>One world at a time. Our newest experience is live on Roblox now.</p>
+      </div>
+
+      <div class="game-stage">
+        <article class="game-card" aria-labelledby="game-title">
+          <div class="game-art">
+            <div class="game-art-inner">
+              <div class="game-scene">
+                <div class="game-floor" aria-hidden="true"><div class="game-grid" data-floor></div></div>
+                <div class="game-glow" aria-hidden="true" data-depth="0.4"></div>
+                <div class="game-orbits" aria-hidden="true" data-depth="0.7">
+                  <span class="g-orbit g-orbit-1"><i></i></span>
+                  <span class="g-orbit g-orbit-2"><i></i></span>
+                  <span class="g-orbit g-orbit-3"><i></i></span>
+                </div>
+                <div class="game-symbol" aria-hidden="true" data-depth="1.2">
+                  <div class="star-float">
+                    <span class="star-halo"></span>
+                    <svg viewBox="0 0 100 100" focusable="false">
+                      <defs>
+                        <linearGradient id="starGold" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0" stop-color="#fff1b3"/><stop offset=".45" stop-color="#f4c21b"/><stop offset="1" stop-color="#a87708"/>
+                        </linearGradient>
+                      </defs>
+                      <path d="M50 2 C53 34 66 47 98 50 C66 53 53 66 50 98 C47 66 34 53 2 50 C34 47 47 34 50 2Z" fill="url(#starGold)"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="game-sparks" aria-hidden="true" data-depth="1.6"><i></i><i></i><i></i><i></i><i></i></div>
+              </div>
+            </div>
+            <div class="game-badge">TRIDENT ORIGINAL</div>
+            <div class="game-art-label" data-depth="0.5"><span class="lm"><span>HAPPY</span></span><span class="lm"><strong>PET</strong></span><span class="lm"><span>GAME</span></span></div>
+            <div class="game-sheen" aria-hidden="true"></div>
+          </div>
+          <div class="game-info">
+            <p class="eyebrow"><span class="eyebrow-line"></span> NOW LIVE ON ROBLOX</p>
+            <h3 id="game-title">Happy Pet Game</h3>
+            <p class="game-desc">Collect, grow, explore, and build your own little <span class="nowrap">pet-filled</span> world. A cozy progression experience made for players who like to chase the next unlock.</p>
+            <dl class="game-meta">
+              <div><dt>PLATFORM</dt><dd>ROBLOX</dd></div>
+              <div><dt>GENRE</dt><dd>COLLECT · SIM</dd></div>
+              <div><dt>STATUS</dt><dd class="live"><span class="live-dot" aria-hidden="true"></span> LIVE</dd></div>
+            </dl>
+            <a class="button button-primary wide" href="https://www.roblox.com/games/93776169505376/happy-pet-game" target="_blank" rel="noopener" data-magnetic="soft" data-cursor="Open Roblox">
+              <span class="button-fill" aria-hidden="true"></span>
+              <span class="roll" data-roll>PLAY HAPPY PET GAME</span>
+              <span class="button-icon" aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============================== STUDIO ============================== -->
     <section id="studio" class="section studio-section">
-      <div class="studio-image reveal">
-        <img src="assets/trident-logo.jpeg" alt="Trident logo">
-        <div class="image-caption">TRIDENT / EST. 2026</div>
-      </div>
-      <div class="studio-copy reveal">
-        <p class="eyebrow"><span></span> THE STUDIO</p>
-        <h2>SMALL TEAM.<br><em>BIG WORLDS.</em></h2>
-        <p>We care about the details players actually feel: satisfying progression, clean interfaces, memorable moments, and worlds that make you want to stay a little longer.</p>
-        <p>Trident is built around a simple idea — games should feel premium without losing the fun.</p>
-        <div class="principles">
-          <div><span>01</span><strong>POLISHED</strong><small>Every interaction matters.</small></div>
-          <div><span>02</span><strong>SOCIAL</strong><small>Made to be shared.</small></div>
-          <div><span>03</span><strong>BOLD</strong><small>Never afraid to experiment.</small></div>
+      <figure class="studio-image frame" data-tilt>
+        <div class="frame-media studio-media">
+          <div class="studio-layer" data-studio-media>
+            <span class="frame-glow"></span>
+            <img src="assets/trident-logo.jpeg" alt="Trident logo" loading="lazy">
+          </div>
+          <span class="studio-sheen" aria-hidden="true"></span>
         </div>
+        <span class="frame-ticks" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+        <figcaption class="image-caption">TRIDENT / EST. 2026</figcaption>
+      </figure>
+      <div class="studio-copy">
+        <div class="section-meta" data-reveal="meta">
+          <p class="eyebrow"><span class="eyebrow-line"></span> THE STUDIO</p>
+          <span class="section-num" aria-hidden="true">(02)</span>
+        </div>
+        <h2 data-split>SMALL TEAM. <br><em>BIG WORLDS.</em></h2>
+        <p data-lines>We care about the details players actually feel: satisfying progression, clean interfaces, memorable moments, and worlds that make you want to stay a little longer.</p>
+        <p data-lines>Trident is built around a simple idea — games should feel premium without losing the fun.</p>
+        <ul class="principles" data-principles>
+          <li style="--i:0"><span class="p-num">01</span><strong>POLISHED</strong><small>Every interaction matters.</small><span class="p-arrow" aria-hidden="true">→</span></li>
+          <li style="--i:1"><span class="p-num">02</span><strong>SOCIAL</strong><small>Made to be shared.</small><span class="p-arrow" aria-hidden="true">→</span></li>
+          <li style="--i:2"><span class="p-num">03</span><strong>BOLD</strong><small>Never afraid to experiment.</small><span class="p-arrow" aria-hidden="true">→</span></li>
+        </ul>
       </div>
     </section>
 
-    <section class="quote-section reveal">
-      <div class="quote-line"></div>
-      <blockquote>“MAKE SOMETHING<br><em>PLAYERS REMEMBER.</em>”</blockquote>
-      <div class="quote-line"></div>
+    <!-- ============================== QUOTE ============================== -->
+    <section class="quote-section" aria-label="Studio motto">
+      <span class="quote-glow" aria-hidden="true"></span>
+      <div class="quote-line" data-line aria-hidden="true"></div>
+      <blockquote data-words><span class="q q-open">“</span>MAKE SOMETHING <br><em>PLAYERS</em> <span class="nowrap"><em>REMEMBER.</em><span class="q">”</span></span></blockquote>
+      <div class="quote-line" data-line aria-hidden="true"></div>
     </section>
 
+    <!-- ============================== CONTACT ============================== -->
     <section id="contact" class="section contact-section">
-      <div>
-        <p class="eyebrow"><span></span> NEXT CHAPTER</p>
-        <h2>LET'S MAKE<br><em>NOISE.</em></h2>
+      <div class="contact-head">
+        <div class="section-meta" data-reveal="meta">
+          <p class="eyebrow"><span class="eyebrow-line"></span> NEXT CHAPTER</p>
+          <span class="section-num" aria-hidden="true">(03)</span>
+        </div>
+        <h2 data-split>LET’S MAKE <br><em>NOISE.</em></h2>
       </div>
       <div class="contact-card">
-        <p>For collaborations, creator opportunities, or just saying hello:</p>
-        <a href="mailto:bkprosytbusiness@gmail.com">bkprosytbusiness@gmail.com</a>
+        <p data-lines>For collaborations, creator opportunities, or just saying hello:</p>
+        <a class="contact-email" href="mailto:bkprosytbusiness@gmail.com" data-reveal data-cursor="Send an email">
+          <span class="contact-email-text">bkprosytbusiness@gmail.com</span>
+          <span class="contact-email-arrow" aria-hidden="true">↗</span>
+          <span class="contact-email-line" aria-hidden="true"></span>
+        </a>
       </div>
     </section>
   </main>
 
-  <footer>
-    <div class="footer-brand">
-      <img src="assets/trident-logo.jpeg" alt="Trident logo">
-      <span>TRIDENT</span>
+  <!-- ============================== FOOTER ============================== -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="assets/trident-logo.jpeg" alt="Trident logo" width="30" height="30" loading="lazy">
+        <span>TRIDENT</span>
+      </div>
+      <a class="footer-top-link" href="#top"><span class="roll" data-roll>Back to top</span> <span aria-hidden="true">↑</span></a>
     </div>
-    <p>© 2026 Trident Studio. All rights reserved.</p>
-    <a href="https://www.roblox.com/games/93776169505376/happy-pet-game" target="_blank" rel="noopener">Roblox ↗</a>
-  </footer>
 
-  <script src="script.js"></script>
+    <!-- finale: a gold sun rises on a horizon and the wordmark lifts out of it -->
+    <div class="horizon" aria-hidden="true">
+      <span class="horizon-sun"></span>
+      <div class="horizon-floor"><div class="horizon-grid" data-floor></div></div>
+      <span class="horizon-line"></span>
+      <div class="footer-word" data-footer-word><span>T</span><span>R</span><span>I</span><span>D</span><span>E</span><span>N</span><span>T</span></div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Trident Studio. All rights reserved.</p>
+      <div class="footer-actions">
+        <!-- shown by script.js when motion is on: stops every self-running loop (WCAG 2.2.2) -->
+        <button class="motion-toggle" type="button" aria-label="Pause motion" aria-pressed="false" data-motion-toggle hidden><span class="motion-toggle-icon" aria-hidden="true"></span><span class="roll mt-off" data-roll aria-hidden="true">Pause motion</span><span class="roll mt-on" data-roll aria-hidden="true">Play motion</span></button>
+        <a href="https://www.roblox.com/games/93776169505376/happy-pet-game" target="_blank" rel="noopener" data-cursor="Open Roblox"><span class="roll" data-roll>Roblox</span> <span aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
