@@ -3,11 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#07080a">
-  <meta name="description" content="Trident — an independent game development studio creating bold, memorable Roblox experiences.">
-  <title>Trident — Game Development Studio</title>
-  <link rel="icon" href="assets/trident-logo.jpeg" type="image/jpeg">
-  <link rel="apple-touch-icon" href="assets/trident-logo.jpeg">
+  <meta name="theme-color" content="#050d22">
+  <meta name="color-scheme" content="dark">
+  <title>Starfall Inc. — Independent Roblox Game Studio</title>
+  <meta name="description" content="Starfall Inc. is an independent Roblox game studio run by solo developer BKProsYT. Play Pet Dimensions on Roblox — 500+ pets to collect.">
+
+  <link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/brand/favicon-48.png" sizes="48x48" type="image/png">
+  <link rel="icon" href="assets/brand/favicon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+
+  <!-- Open Graph / Twitter (relative image path: swap in the absolute URL once the domain is known) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Starfall Inc.">
+  <meta property="og:title" content="Starfall Inc. — Independent Roblox Game Studio">
+  <meta property="og:description" content="A solo Roblox studio by BKProsYT. Pet Dimensions is live on Roblox — 500+ pets to collect.">
+  <meta property="og:image" content="assets/brand/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Starfall Inc. shooting-star logo and STARFALL INC. wordmark on a night sky">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Starfall Inc. — Independent Roblox Game Studio">
+  <meta name="twitter:description" content="A solo Roblox studio by BKProsYT. Pet Dimensions is live on Roblox — 500+ pets to collect.">
+  <meta name="twitter:image" content="assets/brand/og-image.jpg">
+  <meta name="twitter:image:alt" content="The Starfall Inc. shooting-star logo and STARFALL INC. wordmark on a night sky">
+
+  <style>html{background:#050d22}</style>
 
   <!--
     Progressive-enhancement switches (run before first paint):
@@ -26,19 +47,21 @@
         try {
           // a visitor who paused motion (remembered on this device) never gets the curtain either
           var paused = false;
-          try { paused = localStorage.getItem('trd-paused') === '1'; } catch (e) { /* storage blocked */ }
-          if (!paused && !sessionStorage.getItem('trd-intro')) { h.classList.add('show-intro'); sessionStorage.setItem('trd-intro', '1'); }
+          try { paused = localStorage.getItem('sf-paused') === '1'; } catch (e) { /* storage blocked */ }
+          if (!paused && !sessionStorage.getItem('sf-intro')) { h.classList.add('show-intro'); sessionStorage.setItem('sf-intro', '1'); }
         } catch (e) { /* storage blocked: skip the intro */ }
       }
       setTimeout(function () { if (!h.classList.contains('ready')) h.classList.add('no-anim'); }, 1500);
     })(document);
   </script>
 
+  <link rel="preload" href="assets/brand/starfall-star.webp" as="image" type="image/webp">
+  <link rel="preload" href="assets/brand/starfall-trail.webp" as="image" type="image/webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Manrope (display) · Instrument Serif italic (accents) · DM Sans (body). Non-blocking; the intro covers the swap. -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&amp;family=Instrument+Serif:ital@0;1&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&amp;family=Instrument+Serif:ital@0;1&amp;family=Manrope:wght@500;600;700;800&amp;display=swap"></noscript>
+  <!-- Unbounded (display) · Fredoka (the banner voice: wordmark, game title, accents, buttons) · DM Sans (body). Non-blocking. -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&amp;family=Fredoka:wght@500;600;700&amp;family=Unbounded:wght@500;600;700;800&amp;display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&amp;family=Fredoka:wght@500;600;700&amp;family=Unbounded:wght@500;600;700;800&amp;display=swap"></noscript>
   <link rel="stylesheet" href="assets/vendor/lenis.css">
   <link rel="stylesheet" href="styles.css">
 
@@ -52,40 +75,61 @@
 <body>
   <a class="skip-link" href="#top">Skip to content</a>
 
-  <!-- Intro curtain: first visit only, ≈1.75s, timed by CSS from first paint -->
+  <!-- The night sky: a fixed navy gradient + the starfield canvas (script.js). CSS stars stand in without JS. -->
+  <div class="sky" aria-hidden="true">
+    <span class="sky-glow sky-glow-a"></span>
+    <span class="sky-glow sky-glow-b"></span>
+    <span class="sky-dots"></span>
+    <canvas class="sky-canvas"></canvas>
+  </div>
+
+  <!-- Intro curtain: first visit only, ≈1.75s, timed by CSS from first paint.
+       A comet streaks in, lands as the Starfall mark, and the name resolves letter by letter. -->
   <div class="intro" aria-hidden="true">
-    <div class="intro-mark">
-      <svg class="intro-ring" viewBox="0 0 120 120"><circle cx="60" cy="60" r="58"/></svg>
-      <img src="assets/trident-logo.jpeg" alt="">
+    <span class="intro-sky"></span>
+    <div class="intro-stage">
+      <div class="intro-mark">
+        <img class="intro-trail" src="assets/brand/starfall-trail.webp" alt="">
+        <span class="intro-flash"></span>
+        <span class="intro-ring"></span>
+        <div class="intro-flyer">
+          <span class="intro-streak"></span>
+          <img class="intro-star" src="assets/brand/starfall-star.webp" alt="">
+        </div>
+      </div>
+      <p class="intro-word"><span>S</span><span>T</span><span>A</span><span>R</span><span>F</span><span>A</span><span>L</span><span>L</span></p>
+      <p class="intro-meta">Independent Roblox studio</p>
     </div>
-    <p class="intro-word"><span>T</span><span>R</span><span>I</span><span>D</span><span>E</span><span>N</span><span>T</span></p>
-    <p class="intro-meta">Independent game studio</p>
   </div>
 
   <!-- ============================== HEADER ============================== -->
   <header class="site-header" data-header>
     <div class="header-glass" aria-hidden="true"><span class="header-progress"></span></div>
 
-    <a class="brand" href="#top" aria-label="Trident home">
-      <span class="brand-mark"><img src="assets/trident-logo.jpeg" alt="Trident logo" width="40" height="40"></span>
-      <span class="brand-word">TRIDENT</span>
+    <a class="brand" href="#top" aria-label="Starfall Inc. home">
+      <span class="brand-mark"><img src="assets/brand/starfall-logo-sm.webp" alt="" width="360" height="348"></span>
+      <span class="brand-word">STARFALL<small>INC.</small></span>
     </a>
 
     <nav class="nav" id="site-nav" aria-label="Main navigation" data-lenis-prevent>
-      <p class="nav-kicker" aria-hidden="true">Menu</p>
+      <p class="nav-kicker" aria-hidden="true">Navigate the sky</p>
       <ul class="nav-list">
         <li style="--i:0"><a class="nav-link" href="#games"><span class="nav-num" aria-hidden="true">01</span><span class="roll" data-roll>Games</span></a></li>
-        <li style="--i:1"><a class="nav-link" href="#studio"><span class="nav-num" aria-hidden="true">02</span><span class="roll" data-roll>Studio</span></a></li>
-        <li style="--i:2"><a class="nav-link" href="#contact"><span class="nav-num" aria-hidden="true">03</span><span class="roll" data-roll>Contact</span></a></li>
+        <li style="--i:1"><a class="nav-link" href="#creator"><span class="nav-num" aria-hidden="true">02</span><span class="roll" data-roll>Creator</span></a></li>
+        <li style="--i:2"><a class="nav-link" href="#community"><span class="nav-num" aria-hidden="true">03</span><span class="roll" data-roll>Community</span></a></li>
+        <li style="--i:3"><a class="nav-link" href="#contact"><span class="nav-num" aria-hidden="true">04</span><span class="roll" data-roll>Contact</span></a></li>
       </ul>
-      <a class="nav-cta" href="https://www.roblox.com/games/93776169505376/happy-pet-game" target="_blank" rel="noopener" data-magnetic="soft">
+      <a class="nav-cta" href="https://www.roblox.com/games/101553263361830/Pet-Dimensions" target="_blank" rel="noopener" data-magnetic="soft" data-burst="gold">
         <span class="nav-cta-fill" aria-hidden="true"></span>
-        <span class="roll" data-roll>Play our game</span>
+        <span class="roll" data-roll>Play Pet Dimensions</span>
         <span class="nav-cta-icon" aria-hidden="true">↗</span>
       </a>
-      <div class="nav-foot" aria-hidden="true">
-        <span>Trident Studio</span>
-        <span>Roblox experiences</span>
+      <div class="nav-foot">
+        <span class="nav-foot-name" aria-hidden="true">Starfall Inc.</span>
+        <span class="nav-foot-links">
+          <a href="https://www.youtube.com/@BKProsYT" target="_blank" rel="noopener" aria-label="YouTube: @BKProsYT"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-youtube"/></svg></a>
+          <a href="https://discord.gg/petdimensions" target="_blank" rel="noopener" aria-label="Discord: discord.gg/petdimensions"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-discord"/></svg></a>
+        </span>
       </div>
     </nav>
 
@@ -98,147 +142,173 @@
   <main id="top">
     <!-- ============================== HERO ============================== -->
     <section class="hero" aria-labelledby="hero-title">
-      <canvas class="hero-dust" aria-hidden="true"></canvas>
-      <div class="hero-bg" aria-hidden="true">
-        <span class="hero-glow"></span>
-        <span class="hero-rule rule-a"></span>
-        <span class="hero-rule rule-b"></span>
-      </div>
-
       <div class="hero-inner">
-        <p class="eyebrow hero-eyebrow" data-hero="fade"><span class="eyebrow-line"></span> INDEPENDENT GAME STUDIO</p>
-        <h1 id="hero-title" class="hero-title" data-hero="title">WE BUILD WORLDS <br><em>WORTH PLAYING.</em></h1>
+        <p class="eyebrow hero-eyebrow" data-hero="fade"><span class="eyebrow-star" aria-hidden="true"></span> Independent Roblox game studio</p>
+        <h1 id="hero-title" class="hero-title" data-hero="title">Catch a <br><em>falling</em> star.</h1>
         <p class="hero-copy" data-hero="lines">
-          Trident is a game development studio focused on creating polished,
-          social experiences with personality, progression, and a little bit of chaos.
+          Starfall Inc. is a one-developer Roblox studio by BKProsYT.
+          Its game, Pet Dimensions, is live <span class="nowrap">now —</span> build an army of the best pets and take over the world.
         </p>
         <div class="hero-actions" data-hero="fade">
-          <a class="button button-primary" href="#games" data-magnetic>
+          <a class="button button-primary" href="https://www.roblox.com/games/101553263361830/Pet-Dimensions" target="_blank" rel="noopener" data-magnetic data-burst="gold" data-cursor="Open Roblox">
             <span class="button-fill" aria-hidden="true"></span>
-            <span class="roll" data-roll>Explore our games</span>
-            <span class="button-icon" aria-hidden="true">↓</span>
+            <span class="roll" data-roll>Play Pet Dimensions</span>
+            <span class="button-icon" aria-hidden="true">↗</span>
           </a>
-          <a class="button button-ghost" href="#studio" data-magnetic>
+          <a class="button button-ghost" href="#games" data-magnetic>
             <span class="button-fill" aria-hidden="true"></span>
-            <span class="roll" data-roll>About Trident</span>
+            <span class="roll" data-roll>Discover the game</span>
+            <span class="button-icon" aria-hidden="true">↓</span>
           </a>
         </div>
 
-        <!-- framed still: the logo's grey ground is dissolved into a gold glow (contrast + screen blend) -->
-        <div class="hero-frame frame" aria-hidden="true" data-hero="frame">
-          <div class="frame-media" data-frame-media>
-            <span class="frame-glow"></span>
-            <span class="frame-orbit"></span>
-            <img src="assets/trident-logo.jpeg" alt="">
+        <!-- the Starfall mark as two layers (comet trail + star) on a slowly turning star chart -->
+        <div class="hero-mark" aria-hidden="true" data-hero="mark">
+          <div class="mark-depth" data-mark-depth>
+            <span class="mark-halo"></span>
+            <div class="mark-chart-wrap">
+              <svg class="mark-chart" viewBox="0 0 400 400" focusable="false">
+                <circle class="chart-ring" cx="200" cy="200" r="196"/>
+                <circle class="chart-ticks" cx="200" cy="200" r="188" pathLength="360"/>
+                <circle class="chart-ring chart-ring-in" cx="200" cy="200" r="150"/>
+                <circle class="chart-dash" cx="200" cy="200" r="120"/>
+                <path class="chart-axis" d="M200 0V60M200 340V400M0 200H60M340 200H400"/>
+              </svg>
+            </div>
+            <div class="mark-art" data-mark-art>
+              <div class="mark-tail" data-mark-tail>
+                <img class="mark-trail" src="assets/brand/starfall-trail.webp" alt="" width="760" height="735">
+                <span class="mark-shine"></span>
+              </div>
+              <span class="mark-flash"></span>
+              <div class="mark-star-wrap" data-mark-star>
+                <img class="mark-star" src="assets/brand/starfall-star.webp" alt="" width="760" height="735">
+              </div>
+              <span class="mark-glint"></span>
+            </div>
           </div>
-          <span class="frame-ticks"><i></i><i></i><i></i><i></i></span>
-          <span class="frame-cap">Trident <em>✦</em> Roblox experiences</span>
         </div>
       </div>
 
       <div class="hero-foot" data-hero="fade">
-        <div class="scroll-note">SCROLL TO EXPLORE <span class="scroll-line" aria-hidden="true"></span></div>
-        <a class="hero-live" href="#games"><span class="live-dot" aria-hidden="true"></span> Happy Pet Game <span class="hero-live-sep" aria-hidden="true">—</span> <span class="hero-live-muted">Now live on Roblox</span></a>
+        <div class="scroll-note">Scroll the night sky <span class="scroll-line" aria-hidden="true"></span></div>
+        <a class="hero-live" href="#games"><span class="live-dot" aria-hidden="true"></span> Pet Dimensions <span class="hero-live-sep" aria-hidden="true">—</span> <span class="hero-live-muted">Live on Roblox</span></a>
       </div>
     </section>
 
-    <!-- ============================== TICKER ============================== -->
-    <section class="ticker" aria-label="Trident statement">
-      <div class="ticker-track" data-marquee>
-        <p class="ticker-group">GAMES <span class="tk-star" aria-hidden="true">✦</span> <em>COMMUNITY</em> <span class="tk-star" aria-hidden="true">✦</span> CRAFT <span class="tk-star" aria-hidden="true">✦</span> GAMES <span class="tk-star" aria-hidden="true">✦</span> <em>COMMUNITY</em> <span class="tk-star" aria-hidden="true">✦</span> CRAFT <span class="tk-star" aria-hidden="true">✦</span></p>
-        <p class="ticker-group" aria-hidden="true">GAMES <span class="tk-star">✦</span> <em>COMMUNITY</em> <span class="tk-star">✦</span> CRAFT <span class="tk-star">✦</span> GAMES <span class="tk-star">✦</span> <em>COMMUNITY</em> <span class="tk-star">✦</span> CRAFT <span class="tk-star">✦</span></p>
+    <!-- ============================== RIFT (energy tear + marquee) ==============================
+         A planet's rim of light, then a tear in the sky carrying the game's promise. -->
+    <section class="rift" aria-label="Pet Dimensions in a line">
+      <div class="limb" aria-hidden="true"><span class="limb-planet"></span></div>
+      <div class="rift-band" data-rift>
+        <div class="rift-lean" data-lean>
+        <div class="rift-track" data-marquee>
+          <p class="rift-group">Pet Dimensions <span class="rift-star" aria-hidden="true"></span> 500+ pets to collect <span class="rift-star" aria-hidden="true"></span> Build your army <span class="rift-star" aria-hidden="true"></span> Take over the world <span class="rift-star" aria-hidden="true"></span></p>
+          <p class="rift-group" aria-hidden="true">Pet Dimensions <span class="rift-star"></span> 500+ pets to collect <span class="rift-star"></span> Build your army <span class="rift-star"></span> Take over the world <span class="rift-star"></span></p>
+        </div>
+        </div>
       </div>
     </section>
 
-    <!-- ============================== GAMES ============================== -->
+    <!-- ============================== GAMES (the portal) ============================== -->
     <section id="games" class="section games-section">
       <div class="section-heading">
         <div>
           <div class="section-meta" data-reveal="meta">
-            <p class="eyebrow"><span class="eyebrow-line"></span> SELECTED WORK</p>
-            <span class="section-num" aria-hidden="true">(01)</span>
+            <p class="eyebrow"><span class="eyebrow-star" aria-hidden="true"></span> Now showing on Roblox</p>
+            <span class="section-num" aria-hidden="true">01</span>
           </div>
-          <h2 data-split>OUR <em>LATEST</em> <br>ADVENTURE.</h2>
+          <h2 data-split>Enter the <br><em>dimensions.</em></h2>
         </div>
-        <p class="section-intro" data-lines>One world at a time. Our newest experience is live on Roblox now.</p>
+        <p class="section-intro" data-lines>The feature presentation: step through the portal into a pet-collecting adventure on Roblox.</p>
       </div>
+      <svg class="constellation c-games" aria-hidden="true" focusable="false" data-constellation>
+        <line x1="8%" y1="70%" x2="34%" y2="22%"/><line x1="34%" y1="22%" x2="61%" y2="48%"/><line x1="61%" y1="48%" x2="92%" y2="14%"/><line x1="61%" y1="48%" x2="78%" y2="88%"/>
+        <circle cx="8%" cy="70%" r="2"/><circle cx="34%" cy="22%" r="2.6"/><circle class="c-gold" cx="61%" cy="48%" r="3.2"/><circle cx="92%" cy="14%" r="2"/><circle cx="78%" cy="88%" r="2.2"/>
+      </svg>
 
       <div class="game-stage">
         <article class="game-card" aria-labelledby="game-title">
           <div class="game-art">
             <div class="game-art-inner">
-              <div class="game-scene">
-                <div class="game-floor" aria-hidden="true"><div class="game-grid" data-floor></div></div>
-                <div class="game-glow" aria-hidden="true" data-depth="0.4"></div>
-                <div class="game-orbits" aria-hidden="true" data-depth="0.7">
-                  <span class="g-orbit g-orbit-1"><i></i></span>
-                  <span class="g-orbit g-orbit-2"><i></i></span>
-                  <span class="g-orbit g-orbit-3"><i></i></span>
-                </div>
-                <div class="game-symbol" aria-hidden="true" data-depth="1.2">
-                  <div class="star-float">
-                    <span class="star-halo"></span>
-                    <svg viewBox="0 0 100 100" focusable="false">
-                      <defs>
-                        <linearGradient id="starGold" x1="0" y1="0" x2="1" y2="1">
-                          <stop offset="0" stop-color="#fff1b3"/><stop offset=".45" stop-color="#f4c21b"/><stop offset="1" stop-color="#a87708"/>
-                        </linearGradient>
-                      </defs>
-                      <path d="M50 2 C53 34 66 47 98 50 C66 53 53 66 50 98 C47 66 34 53 2 50 C34 47 47 34 50 2Z" fill="url(#starGold)"/>
-                    </svg>
+              <!-- the portal: a rift that tears open (script.js scrubs --r) onto a vortex, a warp tunnel, floating worlds and the star -->
+              <div class="portal-iris">
+                <div class="game-scene">
+                  <div class="vortex" aria-hidden="true"><span class="vortex-swirl"></span></div>
+                  <div class="tunnel" aria-hidden="true" data-depth="0.25"><i></i><i></i><i></i></div>
+                  <div class="worlds" aria-hidden="true">
+                    <span class="world w1" data-depth="1.4"><i></i></span>
+                    <span class="world w2" data-depth="0.9"><i></i></span>
+                    <span class="world w3" data-depth="0.6"></span>
+                    <span class="world w4" data-depth="1.1"></span>
+                    <span class="world w5" data-depth="0.45"></span>
                   </div>
+                  <div class="portal-core" aria-hidden="true" data-depth="0.5">
+                    <span class="core-glow"></span>
+                    <img class="core-star" src="assets/brand/starfall-star-head.webp" alt="" width="160" height="166" loading="lazy">
+                  </div>
+                  <div class="game-sparks" aria-hidden="true" data-depth="1.7"><i></i><i></i><i></i><i></i><i></i><i></i></div>
                 </div>
-                <div class="game-sparks" aria-hidden="true" data-depth="1.6"><i></i><i></i><i></i><i></i><i></i></div>
               </div>
+              <span class="portal-rim" aria-hidden="true"></span>
+              <span class="rift-flare" aria-hidden="true"></span>
             </div>
-            <div class="game-badge">TRIDENT ORIGINAL</div>
-            <div class="game-art-label" data-depth="0.5"><span class="lm"><span>HAPPY</span></span><span class="lm"><strong>PET</strong></span><span class="lm"><span>GAME</span></span></div>
+            <!-- ========== PET DIMENSIONS COPY — edit the game's name, blurb, facts and link here ==========
+                 The facts come from the game's official Roblox description. The same words also appear in:
+                 the <head> description / og:description / twitter:description ("500+ pets"), the rift marquee
+                 (two identical lines), the hero copy, and the Roblox links in the header CTA, hero button,
+                 creator rows and footer (search for roblox.com). -->
+            <div class="game-badge">A Starfall Inc. original</div>
+            <div class="game-art-label" data-depth="0.4" aria-hidden="true"><span class="lm"><span>Pet</span></span><span class="lm"><strong>Dimensions</strong></span></div>
             <div class="game-sheen" aria-hidden="true"></div>
           </div>
+
           <div class="game-info">
-            <p class="eyebrow"><span class="eyebrow-line"></span> NOW LIVE ON ROBLOX</p>
-            <h3 id="game-title">Happy Pet Game</h3>
-            <p class="game-desc">Collect, grow, explore, and build your own little <span class="nowrap">pet-filled</span> world. A cozy progression experience made for players who like to chase the next unlock.</p>
+            <p class="eyebrow game-live"><span class="live-dot" aria-hidden="true"></span> Live on Roblox</p>
+            <h3 id="game-title">Pet Dimensions</h3>
+            <p class="game-desc">Create an army of the best pets&nbsp;— they will help you take over the world!</p>
+            <p class="game-stat"><strong>500+</strong> <span>pets to collect</span></p>
             <dl class="game-meta">
-              <div><dt>PLATFORM</dt><dd>ROBLOX</dd></div>
-              <div><dt>GENRE</dt><dd>COLLECT · SIM</dd></div>
-              <div><dt>STATUS</dt><dd class="live"><span class="live-dot" aria-hidden="true"></span> LIVE</dd></div>
+              <div><dt>Platform</dt><dd>Roblox</dd></div>
+              <div><dt>Studio</dt><dd>Starfall Inc.</dd></div>
+              <div><dt>Status</dt><dd class="live"><span class="live-dot" aria-hidden="true"></span> Live</dd></div>
             </dl>
-            <a class="button button-primary wide" href="https://www.roblox.com/games/93776169505376/happy-pet-game" target="_blank" rel="noopener" data-magnetic="soft" data-cursor="Open Roblox">
+            <a class="button button-primary button-xl wide" href="https://www.roblox.com/games/101553263361830/Pet-Dimensions" target="_blank" rel="noopener" data-magnetic="soft" data-burst="gold" data-cursor="Open Roblox">
               <span class="button-fill" aria-hidden="true"></span>
-              <span class="roll" data-roll>PLAY HAPPY PET GAME</span>
+              <svg class="button-glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18.926 23.998 0 18.892 5.075.002 24 5.108ZM15.348 10.09l-5.282-1.453-1.414 5.273 5.282 1.453z"/></svg>
+              <span class="roll" data-roll>Play on Roblox</span>
               <span class="button-icon" aria-hidden="true">↗</span>
             </a>
           </div>
+          <!-- ========== /PET DIMENSIONS COPY ========== -->
         </article>
       </div>
     </section>
 
-    <!-- ============================== STUDIO ============================== -->
-    <section id="studio" class="section studio-section">
-      <figure class="studio-image frame" data-tilt>
-        <div class="frame-media studio-media">
-          <div class="studio-layer" data-studio-media>
-            <span class="frame-glow"></span>
-            <img src="assets/trident-logo.jpeg" alt="Trident logo" loading="lazy">
-          </div>
-          <span class="studio-sheen" aria-hidden="true"></span>
+    <!-- ============================== CREATOR ============================== -->
+    <section id="creator" class="section creator-section">
+      <figure class="creator-portrait" data-portrait>
+        <div class="portrait-orbit" aria-hidden="true"><span class="portrait-orbit-star"></span></div>
+        <div class="portrait-ring" aria-hidden="true"></div>
+        <div class="portrait-photo">
+          <img src="assets/brand/bkprosyt-avatar.webp" alt="BKProsYT" width="480" height="480" loading="lazy">
         </div>
-        <span class="frame-ticks" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
-        <figcaption class="image-caption">TRIDENT / EST. 2026</figcaption>
+        <figcaption class="portrait-tag"><strong>BKProsYT</strong><span>Solo developer · Starfall Inc.</span></figcaption>
       </figure>
-      <div class="studio-copy">
+      <!-- drawn by script.js between real elements: the portrait's ring → two free stars → the heading's star -->
+      <svg class="constellation c-creator" aria-hidden="true" focusable="false" data-constellation data-link=".creator-portrait|.786|.214 ; ~.35|-90 ; ~.72|-40 ; .creator-copy .eyebrow-star|.5|.5"></svg>
+      <div class="creator-copy">
         <div class="section-meta" data-reveal="meta">
-          <p class="eyebrow"><span class="eyebrow-line"></span> THE STUDIO</p>
-          <span class="section-num" aria-hidden="true">(02)</span>
+          <p class="eyebrow"><span class="eyebrow-star" aria-hidden="true"></span> The creator</p>
+          <span class="section-num" aria-hidden="true">02</span>
         </div>
-        <h2 data-split>SMALL TEAM. <br><em>BIG WORLDS.</em></h2>
-        <p data-lines>We care about the details players actually feel: satisfying progression, clean interfaces, memorable moments, and worlds that make you want to stay a little longer.</p>
-        <p data-lines>Trident is built around a simple idea — games should feel premium without losing the fun.</p>
-        <ul class="principles" data-principles>
-          <li style="--i:0"><span class="p-num">01</span><strong>POLISHED</strong><small>Every interaction matters.</small><span class="p-arrow" aria-hidden="true">→</span></li>
-          <li style="--i:1"><span class="p-num">02</span><strong>SOCIAL</strong><small>Made to be shared.</small><span class="p-arrow" aria-hidden="true">→</span></li>
-          <li style="--i:2"><span class="p-num">03</span><strong>BOLD</strong><small>Never afraid to experiment.</small><span class="p-arrow" aria-hidden="true">→</span></li>
+        <h2 data-split>One developer. <br><em>A whole sky.</em></h2>
+        <p data-lines>Starfall Inc. is a solo studio. There is no big team behind <span class="nowrap">it —</span> just one developer, BKProsYT, making games for Roblox.</p>
+        <p data-lines>Pet Dimensions is the studio’s game on Roblox right now. Follow the creator on YouTube, and meet the players on Discord.</p>
+        <ul class="facts" data-facts>
+          <li style="--i:0"><a href="https://www.roblox.com/games/101553263361830/Pet-Dimensions" target="_blank" rel="noopener"><span class="f-num" aria-hidden="true">01</span><strong>Play</strong> <small>Pet Dimensions on Roblox</small><span class="f-go" aria-hidden="true">↗</span></a></li>
+          <li style="--i:1"><a href="https://www.youtube.com/@BKProsYT" target="_blank" rel="noopener"><span class="f-num" aria-hidden="true">02</span><strong>Watch</strong> <small>@BKProsYT on YouTube</small><span class="f-go" aria-hidden="true">↗</span></a></li>
+          <li style="--i:2"><a href="https://discord.gg/petdimensions" target="_blank" rel="noopener"><span class="f-num" aria-hidden="true">03</span><strong>Join</strong> <small>discord.gg/petdimensions</small><span class="f-go" aria-hidden="true">↗</span></a></li>
         </ul>
       </div>
     </section>
@@ -247,21 +317,66 @@
     <section class="quote-section" aria-label="Studio motto">
       <span class="quote-glow" aria-hidden="true"></span>
       <div class="quote-line" data-line aria-hidden="true"></div>
-      <blockquote data-words><span class="q q-open">“</span>MAKE SOMETHING <br><em>PLAYERS</em> <span class="nowrap"><em>REMEMBER.</em><span class="q">”</span></span></blockquote>
+      <blockquote data-words>Made with <em>love</em> <br>by <span class="nowrap">Starfall.<span class="q-star" aria-hidden="true"></span></span></blockquote>
+      <p class="quote-cite" data-reveal>From Pet Dimensions on Roblox</p>
       <div class="quote-line" data-line aria-hidden="true"></div>
+    </section>
+
+    <!-- ============================== COMMUNITY ============================== -->
+    <section id="community" class="section community-section">
+      <div class="section-heading">
+        <div>
+          <div class="section-meta" data-reveal="meta">
+            <p class="eyebrow"><span class="eyebrow-star" aria-hidden="true"></span> Community</p>
+            <span class="section-num" aria-hidden="true">03</span>
+          </div>
+          <h2 data-split>Join the <br><em>constellation.</em></h2>
+        </div>
+        <p class="section-intro" data-lines>Two places to find Starfall: the creator’s YouTube channel and the Pet Dimensions Discord server.</p>
+      </div>
+
+      <div class="community-grid" data-community>
+        <svg class="constellation c-link" aria-hidden="true" focusable="false" data-constellation>
+          <line x1="16%" y1="50%" x2="50%" y2="22%"/><line x1="50%" y1="22%" x2="84%" y2="50%"/>
+          <circle cx="16%" cy="50%" r="2.4"/><circle class="c-gold" cx="50%" cy="22%" r="3.4"/><circle cx="84%" cy="50%" r="2.4"/>
+        </svg>
+        <a class="social-card social-yt" href="https://www.youtube.com/@BKProsYT" target="_blank" rel="noopener" data-burst="yt">
+          <span class="social-light" aria-hidden="true"></span>
+          <svg class="social-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-youtube"/></svg>
+          <span class="social-top">
+            <span class="social-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#i-youtube"/></svg></span>
+            <span class="social-avatar" aria-hidden="true"><img src="assets/brand/bkprosyt-avatar.webp" alt="" width="480" height="480" loading="lazy"></span>
+          </span>
+          <span class="social-kind">YouTube</span>
+          <span class="social-handle">@BKProsYT</span>
+          <span class="social-desc">BKProsYT’s channel: the developer behind Starfall and Pet Dimensions.</span>
+          <span class="social-cta"><span class="roll" data-roll>Visit the channel</span><span class="social-arrow" aria-hidden="true">↗</span></span>
+        </a>
+        <a class="social-card social-dc" href="https://discord.gg/petdimensions" target="_blank" rel="noopener" data-burst="dc">
+          <span class="social-light" aria-hidden="true"></span>
+          <svg class="social-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-discord"/></svg>
+          <span class="social-top">
+            <span class="social-glyph" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><use href="#i-discord"/></svg></span>
+          </span>
+          <span class="social-kind">Discord</span>
+          <span class="social-handle">discord.gg/<wbr>petdimensions</span>
+          <span class="social-desc">The Pet Dimensions community server: come and meet the other players.</span>
+          <span class="social-cta"><span class="roll" data-roll>Join the server</span><span class="social-arrow" aria-hidden="true">↗</span></span>
+        </a>
+      </div>
     </section>
 
     <!-- ============================== CONTACT ============================== -->
     <section id="contact" class="section contact-section">
       <div class="contact-head">
         <div class="section-meta" data-reveal="meta">
-          <p class="eyebrow"><span class="eyebrow-line"></span> NEXT CHAPTER</p>
-          <span class="section-num" aria-hidden="true">(03)</span>
+          <p class="eyebrow"><span class="eyebrow-star" aria-hidden="true"></span> Contact</p>
+          <span class="section-num" aria-hidden="true">04</span>
         </div>
-        <h2 data-split>LET’S MAKE <br><em>NOISE.</em></h2>
+        <h2 data-split>Send a signal <br><em>to the stars.</em></h2>
       </div>
       <div class="contact-card">
-        <p data-lines>For collaborations, creator opportunities, or just saying hello:</p>
+        <p data-lines>For business enquiries, collaborations or just saying hello:</p>
         <a class="contact-email" href="mailto:bkprosytbusiness@gmail.com" data-reveal data-cursor="Send an email">
           <span class="contact-email-text">bkprosytbusiness@gmail.com</span>
           <span class="contact-email-arrow" aria-hidden="true">↗</span>
@@ -274,29 +389,40 @@
   <!-- ============================== FOOTER ============================== -->
   <footer class="site-footer">
     <div class="footer-top">
-      <div class="footer-brand">
-        <img src="assets/trident-logo.jpeg" alt="Trident logo" width="30" height="30" loading="lazy">
-        <span>TRIDENT</span>
-      </div>
-      <a class="footer-top-link" href="#top"><span class="roll" data-roll>Back to top</span> <span aria-hidden="true">↑</span></a>
+      <a class="footer-brand" href="#top" aria-label="Starfall Inc. — back to top">
+        <img src="assets/brand/starfall-logo-sm.webp" alt="" width="360" height="348" loading="lazy">
+        <span>STARFALL<small>INC.</small></span>
+      </a>
+      <ul class="footer-links">
+        <li><a href="https://www.roblox.com/games/101553263361830/Pet-Dimensions" target="_blank" rel="noopener" data-cursor="Open Roblox"><span class="roll" data-roll>Pet Dimensions</span> <span aria-hidden="true">↗</span></a></li>
+        <li><a href="https://www.youtube.com/@BKProsYT" target="_blank" rel="noopener" data-cursor="Open YouTube"><span class="roll" data-roll>YouTube</span> <span aria-hidden="true">↗</span></a></li>
+        <li><a href="https://discord.gg/petdimensions" target="_blank" rel="noopener" data-cursor="Open Discord"><span class="roll" data-roll>Discord</span> <span aria-hidden="true">↗</span></a></li>
+      </ul>
     </div>
 
-    <!-- finale: a gold sun rises on a horizon and the wordmark lifts out of it -->
-    <div class="horizon" aria-hidden="true">
-      <span class="horizon-sun"></span>
-      <div class="horizon-floor"><div class="horizon-grid" data-floor></div></div>
-      <span class="horizon-line"></span>
-      <div class="footer-word" data-footer-word><span>T</span><span>R</span><span>I</span><span>D</span><span>E</span><span>N</span><span>T</span></div>
+    <!-- finale: a planet's rim of light rises and the wordmark lifts above it, under a meteor shower -->
+    <div class="finale" aria-hidden="true">
+      <span class="finale-planet"></span>
+      <span class="finale-rim"></span>
+      <div class="footer-word" data-footer-word><span>S</span><span>T</span><span>A</span><span>R</span><span>F</span><span>A</span><span>L</span><span>L</span></div>
     </div>
 
     <div class="footer-bottom">
-      <p>© 2026 Trident Studio. All rights reserved.</p>
+      <p>© 2026 Starfall Inc. All rights reserved.</p>
       <div class="footer-actions">
-        <!-- shown by script.js when motion is on: stops every self-running loop (WCAG 2.2.2) -->
-        <button class="motion-toggle" type="button" aria-label="Pause motion" aria-pressed="false" data-motion-toggle hidden><span class="motion-toggle-icon" aria-hidden="true"></span><span class="roll mt-off" data-roll aria-hidden="true">Pause motion</span><span class="roll mt-on" data-roll aria-hidden="true">Play motion</span></button>
-        <a href="https://www.roblox.com/games/93776169505376/happy-pet-game" target="_blank" rel="noopener" data-cursor="Open Roblox"><span class="roll" data-roll>Roblox</span> <span aria-hidden="true">↗</span></a>
+        <!-- shown by script.js when motion is on: stops every self-running loop (WCAG 2.2.2).
+             Its name is its visible label ("Pause motion" / "Play motion"): the hidden one is display:none. -->
+        <button class="motion-toggle" type="button" data-motion-toggle hidden><span class="motion-toggle-icon" aria-hidden="true"></span><span class="roll mt-off" data-roll>Pause motion</span><span class="roll mt-on" data-roll>Play motion</span></button>
+        <a class="footer-top-link" href="#top"><span class="roll" data-roll>Back to top</span> <span aria-hidden="true">↑</span></a>
       </div>
     </div>
   </footer>
+
+  <!-- brand glyphs (inline, referenced with <use>) -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <!-- YouTube in two fills: full colour by default; --yt-a / --yt-b recolour it (--yt-b:transparent = a monochrome glyph with the play cut out) -->
+    <symbol id="i-youtube" viewBox="0 0 24 24"><path style="fill:var(--yt-a,#ff0033)" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/><path style="fill:var(--yt-b,#fff)" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></symbol>
+    <symbol id="i-discord" viewBox="0 0 24 24"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></symbol>
+  </svg>
 </body>
 </html>
