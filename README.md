@@ -35,7 +35,7 @@ No build step: open `index.html` or upload the folder.
 - **Roblox game link**: `https://www.roblox.com/games/101553263361830/Pet-Dimensions`. It appears in the header CTA, the hero button, the game card, the creator section's "Play" row and the footer links. Search `index.html` for `roblox.com` to change it everywhere.
 - **YouTube** (`@BKProsYT`) and **Discord** (`discord.gg/petdimensions`): they appear in the community cards, the creator section's rows, the mobile menu and the footer. Search for `youtube.com` and `discord.gg`.
 - **Contact email**: the `mailto:` link in the contact section.
-- **Share preview**: the `og:image` and `twitter:image` tags in the `<head>` use a relative path. Once the domain is live, change them to absolute URLs (`https://your-domain/assets/brand/og-image.jpg`).
+- **Domain / share preview**: the `<head>` points the canonical URL, `og:url`, `og:image` and `twitter:image` at `https://bkprosyt.com/`. If the site moves to another domain, change those four tags.
 
 ## Motion & accessibility notes
 - **Three tiers.**
@@ -54,8 +54,10 @@ No build step: open `index.html` or upload the folder.
 
 ## Before publishing
 1. Check the links and the email above.
-2. Change the share-image paths to absolute URLs once the domain is known.
-3. Upload the whole folder (including `assets/`) to your hosting provider.
+2. Deploy the whole folder (including `assets/`). It is a static site: no build command, publish directory = the repository root.
 
-## Custom domain
-Your domain can point to the hosting provider later. The exact DNS records depend on where you host the site, so leave DNS alone until you have chosen a host. Then follow that host's "connect a custom domain" instructions and add the DNS records it asks for at your domain registrar.
+## Custom domain (bkprosyt.com)
+1. Remove `bkprosyt.com` from the old host first (for Lovable: Project → Settings → Domains → remove).
+2. Add `bkprosyt.com` to the new host (for Netlify: Site configuration → Domain management → Add a domain).
+3. At the domain's DNS provider, delete the old host's records (for Lovable: the `A` records and the `_lovable` `TXT` record, and any `AAAA` records) and add the new host's records. For Netlify with external DNS: an `ALIAS`/`ANAME` (or flattened `CNAME`) on `@` to `apex-loadbalancer.netlify.com`, or, if the provider doesn't support those, an `A` record on `@` to `75.2.60.5`; and a `CNAME` on `www` to `<your-site>.netlify.app`. Check the host's own dashboard for the current values.
+4. Wait for DNS to update (minutes to a few hours, up to 48 h); the host then issues the HTTPS certificate.
