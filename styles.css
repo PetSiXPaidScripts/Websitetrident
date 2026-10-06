@@ -1,107 +1,903 @@
+/* ==========================================================================
+   STARFALL — celestial one-pager
+   --------------------------------------------------------------------------
+   A night sky you fall through: a fixed navy sky with a three-depth starfield
+   canvas behind every section, the Starfall comet as the recurring motif
+   (the hero's star breaks away and falls into the Pet Dimensions portal),
+   constellation hairlines that draw as sections arrive.
+   Type: Unbounded (display), Fredoka — the rounded "STARFALL INC." banner
+   voice — for the wordmark, the game title, accent words and buttons,
+   DM Sans for body and tracked micro-labels.
+   Motion lives in script.js; this file holds layout, states and fallbacks.
+
+    0. Tokens            6. Rift (energy tear) 12. Cursor
+    1. Base / reset      7. Games (portal)    13. Intro curtain
+    2. Shared atoms      8. Creator           14. Motion states (hide-before-reveal)
+    3. Buttons + roll    9. Quote             15. Responsive
+    4. Header / nav     10. Community         16. No-JS + reduced motion
+    5. Sky + hero       11. Contact + footer
+   ========================================================================== */
+
+/* 0. Tokens ---------------------------------------------------------------- */
 :root{
-  --bg:#08090b;
-  --surface:#101114;
-  --surface-2:#15171b;
-  --text:#f3f1eb;
-  --muted:#8e8f93;
-  --line:rgba(255,255,255,.10);
-  --gold:#f4c21b;
-  --gold-soft:#c89d18;
-  --max:1180px;
+  --bg:#050d22;             /* night navy (never pure black) */
+  --bg-2:#081634;
+  --bg-3:#0b1d45;
+  --text:#eef4ff;
+  --text-2:#c9d6ee;
+  --muted:#a3b4d3;          /* body copy: ≥ 7.3:1 on every navy used */
+  --dim:#8aa0c4;            /* micro labels: ≥ 5.7:1 */
+  --line:rgba(160,205,255,.1);
+  --line-2:rgba(160,205,255,.2);
+  --cyan:#5fd3ff;
+  --cyan-hi:#a6e9ff;
+  --ice:#8ee8ff;            /* accent words: the banner's cyan */
+  --ink:#07132e;            /* navy ink on gold / cyan */
+  --drop:#08306e;           /* the banner's dark outline, as a hard drop */
+  --blue:#1a7fe6;
+  --blue-lo:#0f4fc4;
+  --gold:#f9c61b;
+  --gold-hi:#ffe27a;
+  --orange:#f47a10;
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --ease-io:cubic-bezier(.77,0,.18,1);   /* the "wipe" curve shared with GSAP */
+  --max:1320px;
+  --gutter:clamp(20px,4vw,64px);
+  --pad-x:max(var(--gutter),calc((100% - var(--max)) / 2));
+  --header-h:80px;
+  --f-display:Unbounded,"Arial Black",system-ui,sans-serif;
+  --f-round:Fredoka,"Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"DM Sans",system-ui,sans-serif;
+  /* the 4-point sparkle used for every small star glyph */
+  --sparkle:polygon(50% 0,61% 39%,100% 50%,61% 61%,50% 100%,39% 61%,0 50%,39% 39%);
+  /* a CSS star field: one hand-scattered, non-repeating 1600×1000 star map (no lattice): the sky without JS, the intro, the menu sheet */
+  --stars:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000'%3E%3Ccircle cx='282' cy='753' r='1.0' fill='%23fff' fill-opacity='0.54'/%3E%3Ccircle cx='629' cy='523' r='1.4' fill='%23a6e9ff' fill-opacity='0.66'/%3E%3Ccircle cx='1322' cy='704' r='1.0' fill='%23fff' fill-opacity='0.54'/%3E%3Ccircle cx='206' cy='148' r='1.4' fill='%23cfeeff' fill-opacity='0.53'/%3E%3Ccircle cx='630' cy='361' r='0.8' fill='%23fff' fill-opacity='0.70'/%3E%3Ccircle cx='345' cy='251' r='0.9' fill='%23fff' fill-opacity='0.72'/%3E%3Ccircle cx='290' cy='398' r='1.4' fill='%23fff' fill-opacity='0.86'/%3E%3Ccircle cx='306' cy='640' r='1.3' fill='%23ffe9a8' fill-opacity='0.63'/%3E%3Ccircle cx='1330' cy='151' r='1.4' fill='%23fff' fill-opacity='0.83'/%3E%3Ccircle cx='684' cy='370' r='1.2' fill='%23a6e9ff' fill-opacity='0.97'/%3E%3Ccircle cx='101' cy='281' r='1.0' fill='%23ffe9a8' fill-opacity='0.99'/%3E%3Ccircle cx='1161' cy='950' r='1.5' fill='%23fff' fill-opacity='0.40'/%3E%3Ccircle cx='591' cy='256' r='1.6' fill='%23fff' fill-opacity='0.95'/%3E%3Ccircle cx='451' cy='595' r='1.1' fill='%23fff' fill-opacity='0.60'/%3E%3Ccircle cx='1082' cy='26' r='0.5' fill='%23fff' fill-opacity='0.87'/%3E%3Ccircle cx='32' cy='335' r='1.1' fill='%23fff' fill-opacity='0.56'/%3E%3Ccircle cx='302' cy='292' r='0.5' fill='%23fff' fill-opacity='0.63'/%3E%3Ccircle cx='1286' cy='857' r='1.0' fill='%23cfeeff' fill-opacity='0.60'/%3E%3Ccircle cx='1534' cy='939' r='0.7' fill='%23fff' fill-opacity='0.89'/%3E%3Ccircle cx='712' cy='553' r='0.5' fill='%23fff' fill-opacity='0.89'/%3E%3Ccircle cx='1514' cy='805' r='0.5' fill='%23fff' fill-opacity='0.40'/%3E%3Ccircle cx='1136' cy='212' r='1.2' fill='%23fff' fill-opacity='0.83'/%3E%3Ccircle cx='1591' cy='696' r='1.1' fill='%23fff' fill-opacity='0.72'/%3E%3Ccircle cx='1477' cy='582' r='1.4' fill='%23a6e9ff' fill-opacity='0.92'/%3E%3Ccircle cx='802' cy='335' r='1.5' fill='%23ffe9a8' fill-opacity='0.51'/%3E%3Ccircle cx='1433' cy='444' r='0.9' fill='%23cfeeff' fill-opacity='0.61'/%3E%3Ccircle cx='864' cy='527' r='1.0' fill='%23fff' fill-opacity='0.50'/%3E%3Ccircle cx='1198' cy='395' r='0.6' fill='%23ffe9a8' fill-opacity='0.81'/%3E%3Ccircle cx='1478' cy='55' r='1.2' fill='%23ffe9a8' fill-opacity='0.94'/%3E%3Ccircle cx='100' cy='653' r='1.4' fill='%23fff' fill-opacity='0.44'/%3E%3Ccircle cx='821' cy='295' r='1.0' fill='%23fff' fill-opacity='0.38'/%3E%3Ccircle cx='1282' cy='730' r='1.6' fill='%23fff' fill-opacity='0.48'/%3E%3Ccircle cx='24' cy='148' r='1.1' fill='%23ffe9a8' fill-opacity='0.59'/%3E%3Ccircle cx='991' cy='342' r='1.1' fill='%23cfeeff' fill-opacity='0.68'/%3E%3Ccircle cx='957' cy='780' r='1.0' fill='%23ffe9a8' fill-opacity='0.50'/%3E%3Ccircle cx='486' cy='360' r='1.1' fill='%23fff' fill-opacity='0.94'/%3E%3Ccircle cx='1031' cy='276' r='1.2' fill='%23fff' fill-opacity='0.83'/%3E%3Ccircle cx='484' cy='484' r='1.6' fill='%23fff' fill-opacity='0.64'/%3E%3Ccircle cx='785' cy='777' r='0.6' fill='%23fff' fill-opacity='0.63'/%3E%3Ccircle cx='1551' cy='118' r='0.5' fill='%23fff' fill-opacity='0.78'/%3E%3Ccircle cx='1333' cy='418' r='1.1' fill='%23fff' fill-opacity='0.45'/%3E%3Ccircle cx='1280' cy='135' r='1.2' fill='%23fff' fill-opacity='0.74'/%3E%3Ccircle cx='1186' cy='554' r='0.6' fill='%23fff' fill-opacity='0.90'/%3E%3Ccircle cx='356' cy='722' r='1.6' fill='%23cfeeff' fill-opacity='0.92'/%3E%3Ccircle cx='439' cy='939' r='0.7' fill='%23cfeeff' fill-opacity='0.91'/%3E%3Ccircle cx='1073' cy='367' r='0.5' fill='%23fff' fill-opacity='0.56'/%3E%3Ccircle cx='85' cy='928' r='1.5' fill='%23fff' fill-opacity='0.51'/%3E%3Ccircle cx='611' cy='145' r='0.6' fill='%23fff' fill-opacity='0.98'/%3E%3Ccircle cx='225' cy='276' r='1.2' fill='%23ffe9a8' fill-opacity='0.51'/%3E%3Ccircle cx='543' cy='338' r='1.0' fill='%23fff' fill-opacity='0.53'/%3E%3Ccircle cx='1230' cy='666' r='0.9' fill='%23fff' fill-opacity='0.54'/%3E%3Ccircle cx='976' cy='508' r='1.5' fill='%23fff' fill-opacity='0.38'/%3E%3Ccircle cx='983' cy='179' r='0.7' fill='%23fff' fill-opacity='0.47'/%3E%3Ccircle cx='604' cy='933' r='0.9' fill='%23fff' fill-opacity='0.37'/%3E%3Ccircle cx='168' cy='485' r='0.9' fill='%23fff' fill-opacity='0.70'/%3E%3Ccircle cx='462' cy='693' r='0.5' fill='%23a6e9ff' fill-opacity='0.80'/%3E%3Ccircle cx='1412' cy='719' r='1.4' fill='%23fff' fill-opacity='0.47'/%3E%3Ccircle cx='399' cy='757' r='1.4' fill='%23fff' fill-opacity='0.86'/%3E%3Ccircle cx='853' cy='770' r='0.5' fill='%23fff' fill-opacity='0.43'/%3E%3Ccircle cx='1360' cy='951' r='0.9' fill='%23fff' fill-opacity='0.57'/%3E%3Ccircle cx='531' cy='115' r='1.2' fill='%23ffe9a8' fill-opacity='0.94'/%3E%3Ccircle cx='789' cy='965' r='0.6' fill='%23fff' fill-opacity='0.92'/%3E%3Ccircle cx='31' cy='627' r='1.0' fill='%23fff' fill-opacity='0.95'/%3E%3Ccircle cx='255' cy='220' r='0.6' fill='%23fff' fill-opacity='0.99'/%3E%3Ccircle cx='209' cy='743' r='1.1' fill='%23ffe9a8' fill-opacity='0.65'/%3E%3Ccircle cx='537' cy='796' r='0.7' fill='%23ffe9a8' fill-opacity='0.37'/%3E%3Ccircle cx='1531' cy='400' r='1.0' fill='%23fff' fill-opacity='0.51'/%3E%3Ccircle cx='243' cy='718' r='0.7' fill='%23fff' fill-opacity='0.43'/%3E%3Ccircle cx='1219' cy='334' r='0.7' fill='%23ffe9a8' fill-opacity='0.36'/%3E%3Ccircle cx='69' cy='501' r='1.4' fill='%23fff' fill-opacity='0.71'/%3E%3Ccircle cx='999' cy='971' r='1.2' fill='%23a6e9ff' fill-opacity='0.43'/%3E%3Ccircle cx='1106' cy='817' r='1.1' fill='%23cfeeff' fill-opacity='0.84'/%3E%3Ccircle cx='786' cy='598' r='1.4' fill='%23fff' fill-opacity='0.55'/%3E%3Ccircle cx='1432' cy='848' r='0.6' fill='%23cfeeff' fill-opacity='0.98'/%3E%3Ccircle cx='427' cy='138' r='1.1' fill='%23fff' fill-opacity='0.92'/%3E%3Ccircle cx='1288' cy='82' r='0.9' fill='%23fff' fill-opacity='0.46'/%3E%3Ccircle cx='685' cy='854' r='0.6' fill='%23cfeeff' fill-opacity='0.70'/%3E%3Ccircle cx='785' cy='697' r='0.9' fill='%23fff' fill-opacity='0.56'/%3E%3Ccircle cx='1135' cy='25' r='1.4' fill='%23fff' fill-opacity='0.57'/%3E%3Ccircle cx='412' cy='417' r='0.9' fill='%23a6e9ff' fill-opacity='0.69'/%3E%3Ccircle cx='895' cy='293' r='0.8' fill='%23fff' fill-opacity='0.52'/%3E%3Ccircle cx='1031' cy='176' r='0.7' fill='%23fff' fill-opacity='0.53'/%3E%3Ccircle cx='127' cy='611' r='0.6' fill='%23cfeeff' fill-opacity='0.69'/%3E%3Ccircle cx='771' cy='146' r='0.8' fill='%23fff' fill-opacity='0.61'/%3E%3Ccircle cx='205' cy='917' r='0.7' fill='%23cfeeff' fill-opacity='0.85'/%3E%3Ccircle cx='1333' cy='14' r='1.2' fill='%23ffe9a8' fill-opacity='0.97'/%3E%3Ccircle cx='963' cy='668' r='1.6' fill='%23fff' fill-opacity='0.58'/%3E%3Ccircle cx='511' cy='964' r='1.4' fill='%23fff' fill-opacity='0.79'/%3E%3Ccircle cx='1444' cy='202' r='0.9' fill='%23fff' fill-opacity='0.71'/%3E%3Ccircle cx='505' cy='852' r='0.6' fill='%23fff' fill-opacity='0.36'/%3E%3Ccircle cx='1199' cy='515' r='1.0' fill='%23fff' fill-opacity='0.68'/%3E%3Ccircle cx='717' cy='162' r='1.1' fill='%23fff' fill-opacity='0.40'/%3E%3Ccircle cx='659' cy='961' r='1.2' fill='%23a6e9ff' fill-opacity='0.65'/%3E%3Ccircle cx='1433' cy='520' r='0.5' fill='%23fff' fill-opacity='0.70'/%3E%3Ccircle cx='1203' cy='115' r='0.5' fill='%23a6e9ff' fill-opacity='0.60'/%3E%3Ccircle cx='952' cy='418' r='1.0' fill='%23fff' fill-opacity='0.70'/%3E%3Ccircle cx='926' cy='480' r='1.1' fill='%23a6e9ff' fill-opacity='0.53'/%3E%3Ccircle cx='37' cy='458' r='0.7' fill='%23fff' fill-opacity='0.84'/%3E%3Ccircle cx='447' cy='52' r='1.2' fill='%23fff' fill-opacity='0.72'/%3E%3Ccircle cx='489' cy='535' r='0.8' fill='%23a6e9ff' fill-opacity='0.51'/%3E%3Ccircle cx='587' cy='316' r='1.1' fill='%23fff' fill-opacity='0.88'/%3E%3Ccircle cx='1283' cy='978' r='0.6' fill='%23cfeeff' fill-opacity='0.50'/%3E%3Ccircle cx='1542' cy='253' r='1.0' fill='%23fff' fill-opacity='0.96'/%3E%3Ccircle cx='743' cy='862' r='1.4' fill='%23fff' fill-opacity='0.92'/%3E%3Ccircle cx='145' cy='185' r='1.5' fill='%23fff' fill-opacity='0.64'/%3E%3Ccircle cx='1507' cy='5' r='0.6' fill='%23fff' fill-opacity='0.71'/%3E%3Ccircle cx='576' cy='710' r='0.7' fill='%23cfeeff' fill-opacity='0.82'/%3E%3Ccircle cx='153' cy='936' r='1.4' fill='%23a6e9ff' fill-opacity='0.52'/%3E%3Ccircle cx='1511' cy='280' r='1.4' fill='%23fff' fill-opacity='0.79'/%3E%3Ccircle cx='1009' cy='390' r='0.5' fill='%23fff' fill-opacity='0.98'/%3E%3Ccircle cx='654' cy='565' r='0.8' fill='%23a6e9ff' fill-opacity='0.66'/%3E%3Ccircle cx='352' cy='483' r='1.0' fill='%23fff' fill-opacity='0.75'/%3E%3Ccircle cx='1285' cy='502' r='0.8' fill='%23fff' fill-opacity='0.79'/%3E%3Ccircle cx='615' cy='22' r='0.8' fill='%23fff' fill-opacity='0.67'/%3E%3Ccircle cx='1392' cy='980' r='1.4' fill='%23cfeeff' fill-opacity='0.44'/%3E%3Ccircle cx='1301' cy='900' r='1.4' fill='%23fff' fill-opacity='0.38'/%3E%3Ccircle cx='1047' cy='852' r='0.9' fill='%23a6e9ff' fill-opacity='0.61'/%3E%3Ccircle cx='391' cy='618' r='0.8' fill='%23fff' fill-opacity='0.44'/%3E%3Ccircle cx='47' cy='240' r='1.4' fill='%23fff' fill-opacity='0.93'/%3E%3Ccircle cx='336' cy='411' r='0.5' fill='%23fff' fill-opacity='0.74'/%3E%3Ccircle cx='1581' cy='636' r='0.9' fill='%23cfeeff' fill-opacity='0.75'/%3E%3Ccircle cx='825' cy='946' r='0.9' fill='%23fff' fill-opacity='0.84'/%3E%3Ccircle cx='410' cy='669' r='1.4' fill='%23fff' fill-opacity='0.99'/%3E%3Ccircle cx='747' cy='396' r='1.6' fill='%23cfeeff' fill-opacity='0.43'/%3E%3Ccircle cx='742' cy='263' r='0.7' fill='%23a6e9ff' fill-opacity='0.42'/%3E%3Ccircle cx='885' cy='925' r='0.9' fill='%23fff' fill-opacity='0.59'/%3E%3Ccircle cx='114' cy='9' r='1.4' fill='%23cfeeff' fill-opacity='0.62'/%3E%3Ccircle cx='580' cy='94' r='1.2' fill='%23cfeeff' fill-opacity='0.67'/%3E%3Ccircle cx='124' cy='477' r='0.5' fill='%23fff' fill-opacity='0.50'/%3E%3Ccircle cx='1086' cy='732' r='0.6' fill='%23fff' fill-opacity='0.58'/%3E%3Ccircle cx='1335' cy='591' r='1.1' fill='%23ffe9a8' fill-opacity='0.97'/%3E%3Ccircle cx='1247' cy='79' r='0.7' fill='%23fff' fill-opacity='0.44'/%3E%3Ccircle cx='1501' cy='148' r='1.4' fill='%23a6e9ff' fill-opacity='0.63'/%3E%3Ccircle cx='777' cy='458' r='0.8' fill='%23ffe9a8' fill-opacity='0.37'/%3E%3Ccircle cx='252' cy='660' r='0.7' fill='%23a6e9ff' fill-opacity='0.55'/%3E%3Ccircle cx='76' cy='164' r='1.4' fill='%23fff' fill-opacity='0.64'/%3E%3Ccircle cx='1411' cy='248' r='1.4' fill='%23fff' fill-opacity='0.40'/%3E%3Ccircle cx='578' cy='539' r='0.8' fill='%23a6e9ff' fill-opacity='0.78'/%3E%3Ccircle cx='359' cy='921' r='1.4' fill='%23fff' fill-opacity='0.94'/%3E%3Ccircle cx='297' cy='900' r='1.4' fill='%23fff' fill-opacity='0.86'/%3E%3Ccircle cx='178' cy='560' r='0.6' fill='%23fff' fill-opacity='0.91'/%3E%3Ccircle cx='246' cy='612' r='0.8' fill='%23fff' fill-opacity='0.87'/%3E%3Ccircle cx='689' cy='286' r='1.1' fill='%23fff' fill-opacity='0.65'/%3E%3Ccircle cx='918' cy='341' r='1.4' fill='%23fff' fill-opacity='0.46'/%3E%3Ccircle cx='387' cy='279' r='0.7' fill='%23fff' fill-opacity='0.56'/%3E%3Ccircle cx='940' cy='115' r='0.6' fill='%23fff' fill-opacity='0.69'/%3E%3Ccircle cx='841' cy='581' r='1.2' fill='%23ffe9a8' fill-opacity='0.62'/%3E%3Ccircle cx='847' cy='86' r='1.7' fill='%23fff' fill-opacity='0.71'/%3E%3Ccircle cx='695' cy='204' r='0.8' fill='%23fff' fill-opacity='0.67'/%3E%3Ccircle cx='1066' cy='578' r='0.6' fill='%23cfeeff' fill-opacity='0.64'/%3E%3C/svg%3E") 50% 50%/1600px 1000px;
 }
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:"DM Sans",system-ui,sans-serif;overflow-x:hidden}
-body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");z-index:20}
+
+/* 1. Base / reset ---------------------------------------------------------- */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;background:var(--bg);scroll-padding-top:calc(var(--header-h) + 16px)} /* focused controls never land under the fixed header */
+@media (prefers-reduced-motion:no-preference){html:not(.lenis){scroll-behavior:smooth}}
+/* with ScrollTrigger live, native smooth scrolling is cancelled by its refreshes: script.js tweens anchors itself */
+html.motion:not(.no-anim){scroll-behavior:auto}
+/* transparent body: the fixed sky (z-index -1) paints between the root background and the content */
+body{margin:0;background:transparent;color:var(--text);font-family:var(--f-body);font-size:16px;line-height:1.6;overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}
+img,svg,canvas{display:block;max-width:100%}
 a{color:inherit;text-decoration:none}
-.site-header{height:82px;display:flex;align-items:center;justify-content:space-between;max-width:var(--max);margin:auto;padding:0 28px;position:absolute;left:0;right:0;top:0;z-index:10}
-.brand,.footer-brand{display:flex;align-items:center;gap:12px;font-family:Manrope,sans-serif;font-weight:800;letter-spacing:.16em}
-.brand img{width:38px;height:38px;object-fit:cover;border-radius:50%;filter:drop-shadow(0 0 12px rgba(244,194,27,.18))}
-.nav{display:flex;align-items:center;gap:34px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#bdbdc0}
-.nav a{transition:.25s ease}
-.nav a:hover{color:#fff}
-.nav-cta{border:1px solid var(--line);padding:12px 16px;border-radius:999px;color:#fff!important}
-.menu-toggle{display:none;background:none;border:0}
-.hero{min-height:850px;height:100vh;max-height:980px;position:relative;display:flex;align-items:center;max-width:1400px;margin:auto;padding:100px 8vw 60px;overflow:hidden}
-.hero:before{content:"";position:absolute;width:650px;height:650px;border-radius:50%;background:radial-gradient(circle,rgba(244,194,27,.10),transparent 65%);right:8%;top:10%}
-.hero-content{position:relative;z-index:2;max-width:730px}
-.eyebrow{display:flex;align-items:center;gap:10px;color:#9d9ea2;font-size:10px;letter-spacing:.22em;font-weight:700;margin:0 0 24px}
-.eyebrow span{width:28px;height:1px;background:var(--gold);display:inline-block}
-h1,h2,h3{font-family:Manrope,sans-serif;margin:0;letter-spacing:-.055em;line-height:.93}
-h1{font-size:clamp(58px,8vw,116px);font-weight:800}
-h1 em,h2 em{font-style:normal;color:var(--gold)}
-.hero-copy{max-width:520px;color:#9b9ca0;font-size:16px;line-height:1.75;margin:30px 0}
-.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
-.button{display:inline-flex;align-items:center;justify-content:center;gap:20px;padding:16px 21px;border-radius:2px;font-size:10px;letter-spacing:.15em;font-weight:800;transition:transform .25s,background .25s,border .25s}
-.button:hover{transform:translateY(-3px)}
-.button-primary{background:var(--gold);color:#090a0b}
-.button-primary:hover{background:#ffd43d}
-.button-ghost{border:1px solid var(--line);color:#ddd}
-.hero-mark{position:absolute;right:4%;top:50%;transform:translateY(-50%);width:min(40vw,560px);aspect-ratio:1;display:grid;place-items:center;opacity:.9}
-.hero-mark img{width:60%;aspect-ratio:1;object-fit:cover;border-radius:50%;box-shadow:0 0 90px rgba(244,194,27,.12)}
-.mark-ring{position:absolute;width:82%;height:82%;border:1px solid rgba(244,194,27,.15);border-radius:50%;animation:spin 24s linear infinite}
-.mark-ring:after{content:"";position:absolute;width:6px;height:6px;background:var(--gold);border-radius:50%;top:12%;left:17%;box-shadow:0 0 20px var(--gold)}
-.hero-orbit{position:absolute;border:1px solid rgba(255,255,255,.04);border-radius:50%;pointer-events:none}
-.orbit-one{width:720px;height:720px;right:-220px;top:100px}
-.orbit-two{width:980px;height:980px;right:-340px;top:-40px}
-.scroll-note{position:absolute;bottom:28px;left:8vw;color:#55575c;font-size:9px;letter-spacing:.2em}
-.scroll-note span{color:var(--gold);margin-left:12px}
-.ticker{overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);white-space:nowrap;color:#67686c;font-family:Manrope;font-weight:700;font-size:11px;letter-spacing:.25em;padding:19px 0}
-.ticker div{display:inline-block;animation:ticker 24s linear infinite}
-.ticker span{color:var(--gold);padding:0 25px}
-.section{max-width:var(--max);margin:auto;padding:150px 28px}
-.section-heading{display:flex;justify-content:space-between;align-items:end;gap:50px;margin-bottom:70px}
-h2{font-size:clamp(48px,6.5vw,86px)}
-.section-intro{max-width:300px;color:var(--muted);font-size:14px;line-height:1.7}
-.game-card{display:grid;grid-template-columns:1.2fr .8fr;background:var(--surface);border:1px solid var(--line);min-height:570px}
-.game-art{position:relative;overflow:hidden;min-height:500px;background:radial-gradient(circle at 50% 45%,#3b3210 0,#171717 28%,#0c0d0f 68%)}
-.game-grid{position:absolute;inset:-20%;opacity:.16;background-image:linear-gradient(rgba(244,194,27,.35) 1px,transparent 1px),linear-gradient(90deg,rgba(244,194,27,.35) 1px,transparent 1px);background-size:55px 55px;transform:perspective(500px) rotateX(55deg) translateY(30%);transform-origin:center}
-.game-glow{position:absolute;width:330px;height:330px;border-radius:50%;background:radial-gradient(circle,rgba(244,194,27,.34),transparent 65%);left:50%;top:45%;transform:translate(-50%,-50%)}
-.game-badge{position:absolute;top:24px;left:24px;border:1px solid rgba(255,255,255,.16);padding:9px 12px;font-size:8px;letter-spacing:.18em;color:#c5c5c5}
-.game-symbol{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);font-size:150px;color:var(--gold);text-shadow:0 0 70px rgba(244,194,27,.45);animation:float 5s ease-in-out infinite}
-.game-art-label{position:absolute;left:32px;bottom:28px;font-family:Manrope;font-size:25px;line-height:.85;letter-spacing:.06em;color:#d7d7d2}
-.game-art-label strong{font-size:43px;color:#fff}
-.game-info{padding:55px;display:flex;flex-direction:column;justify-content:center}
-.game-info h3{font-size:clamp(42px,4vw,64px);margin-bottom:22px}
-.game-info>p:not(.eyebrow){color:var(--muted);line-height:1.75;font-size:14px;max-width:420px}
-.game-meta{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:30px 0;padding:20px 0;gap:15px}
-.game-meta small{display:block;color:#606166;font-size:8px;letter-spacing:.14em;margin-bottom:7px}
-.game-meta strong{font-size:10px;letter-spacing:.08em}
-.live{color:#b6b6b2}.wide{width:100%}
-.studio-section{display:grid;grid-template-columns:.9fr 1.1fr;gap:100px;align-items:center}
-.studio-image{position:relative;aspect-ratio:1;display:grid;place-items:center;background:radial-gradient(circle,rgba(244,194,27,.11),transparent 62%);border:1px solid var(--line)}
-.studio-image img{width:62%;border-radius:50%;box-shadow:0 0 80px rgba(244,194,27,.08)}
-.image-caption{position:absolute;bottom:20px;left:22px;font-size:8px;letter-spacing:.18em;color:#64666a}
-.studio-copy>p:not(.eyebrow){color:var(--muted);line-height:1.8;font-size:14px;max-width:540px}
-.principles{border-top:1px solid var(--line);margin-top:38px}
-.principles>div{display:grid;grid-template-columns:42px 1fr 1fr;align-items:center;padding:17px 0;border-bottom:1px solid var(--line)}
-.principles span{font-size:9px;color:var(--gold)}
-.principles strong{font-size:10px;letter-spacing:.14em}
-.principles small{color:#67686d;font-size:11px}
-.quote-section{padding:70px 28px 150px;max-width:1000px;margin:auto;text-align:center}
-.quote-section blockquote{font-family:Manrope;font-size:clamp(34px,5vw,66px);font-weight:700;line-height:.98;letter-spacing:-.05em;margin:35px 0}
-.quote-line{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
-.contact-section{display:flex;justify-content:space-between;gap:60px;border-top:1px solid var(--line)}
-.contact-card{max-width:430px;padding-top:15px}
-.contact-card>p{color:var(--muted);line-height:1.7;font-size:14px}
-.contact-card>a{display:inline-block;font-family:Manrope;font-weight:700;font-size:clamp(22px,3vw,38px);border-bottom:1px solid var(--gold);padding-bottom:8px;margin:8px 0 20px}
-.contact-note{font-size:10px!important;color:#55575b!important}
-footer{max-width:var(--max);margin:auto;padding:35px 28px 45px;border-top:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;color:#55575b;font-size:10px;letter-spacing:.08em}
-.footer-brand{color:#aaa;font-size:10px}.footer-brand img{width:26px;height:26px;border-radius:50%}footer a{color:#8e8f93}
-.cursor-glow{position:fixed;z-index:30;pointer-events:none;width:250px;height:250px;border-radius:50%;background:radial-gradient(circle,rgba(244,194,27,.06),transparent 68%);transform:translate(-50%,-50%);display:none}
-.reveal{opacity:0;transform:translateY(24px);transition:opacity .8s ease,transform .8s ease}.reveal.visible{opacity:1;transform:none}
-@keyframes spin{to{transform:rotate(360deg)}}@keyframes float{50%{transform:translate(-50%,-55%)}}@keyframes ticker{to{transform:translateX(-50%)}}
-@media (min-width:900px){.cursor-glow{display:block}}
-@media (max-width:850px){
-  .site-header{padding:0 20px}.menu-toggle{display:block;z-index:12}.menu-toggle span{display:block;width:24px;height:1px;background:#fff;margin:6px}
-  .nav{position:fixed;inset:0;background:#08090b;display:flex;flex-direction:column;justify-content:center;gap:28px;opacity:0;pointer-events:none;transform:translateY(-10px);transition:.3s}
-  .nav.open{opacity:1;pointer-events:auto;transform:none}.nav a{font-size:15px}
-  .hero{min-height:760px;height:auto;padding:150px 24px 100px}.hero-mark{opacity:.22;width:85vw;right:-20%;top:55%}.hero-content{max-width:650px}
-  .scroll-note{left:24px}.section{padding:100px 20px}.section-heading{display:block;margin-bottom:45px}.section-intro{margin-top:25px}
-  .game-card{grid-template-columns:1fr}.game-art{min-height:430px}.game-info{padding:34px 25px}
-  .studio-section{grid-template-columns:1fr;gap:55px}.studio-image{max-width:520px}
-  .contact-section{display:block}.contact-card{margin-top:35px}footer{padding:30px 20px;gap:20px;flex-wrap:wrap}
+button{font:inherit;color:inherit}
+p{margin:0}
+ul,dl,dd,figure{margin:0;padding:0}
+::selection{background:var(--cyan);color:var(--bg)}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:4px;border-radius:4px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip-link{position:fixed;left:16px;top:-80px;z-index:400;background:var(--gold);color:var(--bg);padding:14px 18px;border-radius:999px;font:700 11px/1 var(--f-display);letter-spacing:.08em;transition:top .3s var(--ease-out)}
+.skip-link:focus-visible{top:16px}
+main:focus,section:focus{outline:none}
+.sprite{position:absolute;width:0;height:0;overflow:hidden}
+.nowrap{white-space:nowrap}
+
+/* 2. Shared atoms ---------------------------------------------------------- */
+h1,h2,h3{font-family:var(--f-display);margin:0;font-weight:700;letter-spacing:-.035em;line-height:.98;text-transform:uppercase}
+/* every accent word speaks in the banner's voice: chunky rounded cyan with a dark drop, lit from within */
+h1 em,h2 em,blockquote em{font-family:var(--f-round);font-style:normal;font-weight:700;color:var(--ice);letter-spacing:0;text-shadow:0 .055em 0 var(--drop),0 0 .45em rgba(56,200,240,.38)}
+h1 em,h2 em{font-size:1.07em;line-height:.9}
+/* SplitText can leave an empty clone of a wrapper at a line start: it must not carry margins/padding */
+h1 em:empty,h2 em:empty,blockquote em:empty{display:none}
+.eyebrow{display:flex;align-items:center;gap:12px;color:var(--dim);font:600 11px/1.4 var(--f-body);letter-spacing:.26em;text-transform:uppercase;margin:0}
+.eyebrow-star{position:relative;width:12px;height:12px;flex:none;background:var(--gold);clip-path:var(--sparkle);filter:drop-shadow(0 0 6px rgba(249,198,27,.9))}
+.section-meta{display:flex;align-items:center;gap:16px;margin-bottom:30px}
+.section-num{display:inline-grid;place-items:center;min-width:40px;height:24px;padding:0 9px;border:1px solid rgba(249,198,27,.42);border-radius:999px;background:rgba(249,198,27,.07);font:700 12px/1 var(--f-round);color:var(--gold-hi);letter-spacing:.06em;box-shadow:0 0 18px -8px rgba(249,198,27,.7)}
+.live-dot{position:relative;display:inline-block;width:7px;height:7px;border-radius:50%;background:#3ddc84;box-shadow:0 0 12px rgba(61,220,132,.7);flex:none}
+.live-dot::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:1px solid rgba(61,220,132,.6);animation:ping 2.2s var(--ease-out) infinite}
+@keyframes ping{from{transform:scale(.4);opacity:1}to{transform:scale(1.9);opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(.55)}50%{opacity:1;transform:scale(1.15)}}
+
+/* constellation hairlines: an absolutely placed SVG in a section's negative space.
+   Coordinates are percentages (no viewBox), so the nodes stay round at any size. */
+.constellation{position:absolute;pointer-events:none;overflow:visible}
+.constellation line{stroke:rgba(143,224,255,.38);stroke-width:1;stroke-linecap:round}
+.constellation circle{fill:#dff6ff;filter:drop-shadow(0 0 4px rgba(95,211,255,.95))}
+.constellation circle.c-gold{fill:var(--gold-hi);filter:drop-shadow(0 0 6px rgba(249,198,27,.95))}
+
+/* 3. Buttons + rolling text ------------------------------------------------ */
+.button{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;gap:14px;min-height:58px;padding:0 28px 0 30px;border-radius:999px;font:600 16.5px/1 var(--f-round);letter-spacing:.015em;white-space:nowrap;transition:color .45s var(--ease-out),border-color .45s var(--ease-out),box-shadow .45s var(--ease-out)}
+/* primary = the star: a glossy gold game button with a bevel, navy ink */
+.button-primary{color:var(--ink);background:linear-gradient(180deg,#ffe066 0%,var(--gold) 52%,#f3a90f 100%);box-shadow:0 18px 44px -16px rgba(249,170,27,.7),0 0 0 1px rgba(255,236,170,.45) inset,inset 0 1px 0 rgba(255,255,255,.65),inset 0 -3px 0 rgba(196,96,8,.42)}
+.button-xl{min-height:68px;font-size:19.5px;gap:14px}
+.button-glyph{width:21px;height:21px;flex:none;fill:currentColor;margin-left:-4px}
+.button-ghost{color:var(--text);border:1px solid var(--line-2);background:rgba(8,22,52,.35)}
+.button-icon{display:grid;place-items:center;width:34px;height:34px;margin-right:-16px;border-radius:50%;background:var(--ink);color:var(--gold-hi);font:600 14px/1 var(--f-body);transition:transform .6s var(--ease-out)}
+.button-ghost .button-icon{background:rgba(95,211,255,.14);color:var(--cyan-hi);transition:transform .6s var(--ease-out),background-color .45s,color .45s}
+.button-xl .button-icon{width:40px;height:40px;margin-right:-18px}
+/* direction-aware fill: JS writes --x / --y where the pointer crossed the edge */
+.button-fill{position:absolute;z-index:-1;left:var(--x,50%);top:var(--y,50%);width:240%;aspect-ratio:1;border-radius:50%;transform:translate(-50%,-50%) scale(0);transition:transform .75s var(--ease-out);pointer-events:none}
+.button-primary .button-fill{background:linear-gradient(180deg,#fff7cf,#ffd84a)}
+.button-ghost .button-fill{background:var(--cyan)}
+.wide{width:100%}
+/* a glint of starlight crosses the gold CTAs now and then (and at once on hover) */
+.button-primary::after,.nav-cta::after{content:"";position:absolute;z-index:-1;top:-20%;bottom:-20%;left:0;width:38%;background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.75) 50%,transparent 80%);transform:translateX(-120%) skewX(-18deg);pointer-events:none;animation:glint 7s var(--ease-io) 2.4s infinite}
+.nav-cta::after{opacity:.5}
+.hero-actions .button-primary::after{animation-delay:3.2s}
+@keyframes glint{0%{transform:translateX(-120%) skewX(-18deg)}14%,100%{transform:translateX(320%) skewX(-18deg)}}
+@media (hover:hover){.button-primary:hover::after,.nav-cta:hover::after{animation:glint 1.6s var(--ease-out) forwards}}
+
+/* star bursts (script.js): one fixed layer of short-lived sparkles + a shock ring */
+.sparks{position:fixed;inset:0;z-index:240;pointer-events:none;overflow:hidden}
+/* each spark: a 4-point star with a white-hot core; every third one a round ember with a halo */
+.sparks i{position:absolute;display:block;clip-path:var(--sparkle);background:radial-gradient(circle,#fff 0 16%,var(--c) 34%,var(--c) 100%);will-change:transform,opacity}
+.sparks i:nth-child(3n){clip-path:none;border-radius:50%;background:radial-gradient(circle,#fff 0 12%,var(--c) 24%,transparent 66%)}
+.sparks b{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:2px solid var(--c,var(--gold-hi));box-shadow:0 0 22px rgba(249,198,27,.65),inset 0 0 14px rgba(166,233,255,.5)}
+
+/* rolling text — JS duplicates the label into a clone row that rolls in letter by letter */
+.roll{display:inline-block;position:relative}
+.roll-inner{display:inline-block;position:relative;overflow:hidden;vertical-align:top;line-height:1.25;padding:0 .02em;margin:-.125em 0}
+.roll-line{display:block;white-space:pre}
+.roll-clone{position:absolute;left:.02em;top:100%}
+.roll .ch{display:inline-block;white-space:pre;transition:transform .65s var(--ease-out);transition-delay:calc(var(--ci,0) * 14ms)}
+
+@media (hover:hover){
+  .button-primary:hover{box-shadow:0 22px 60px -14px rgba(249,170,27,.8),0 0 0 1px rgba(255,236,170,.7) inset,inset 0 1px 0 rgba(255,255,255,.7)}
+  .button-ghost:hover{color:var(--ink);border-color:var(--cyan);box-shadow:0 18px 50px -18px rgba(95,211,255,.7)}
+  .button-ghost:hover .button-icon{background:var(--ink);color:var(--cyan-hi)}
+  .button:hover .button-fill{transform:translate(-50%,-50%) scale(1)}
+  .button[href^="#"]:hover .button-icon{transform:translateY(3px)}
+  .button[target]:hover .button-icon{transform:rotate(45deg)}
+  a:hover .roll .ch,button:hover .roll .ch{transform:translateY(-100%)}
 }
-@media (max-width:500px){
-  h1{font-size:54px}.hero-copy{font-size:14px}.hero-actions{display:grid}.button{width:100%}.game-meta{grid-template-columns:1fr}.game-meta div{display:flex;justify-content:space-between}.game-symbol{font-size:110px}
+a:focus-visible .roll .ch{transform:translateY(-100%)}
+
+/* 4. Header / nav ---------------------------------------------------------- */
+.site-header{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--header-h);display:flex;align-items:center;justify-content:space-between;gap:24px;padding:0 var(--pad-x)}
+/* opaque gradient instead of a backdrop blur: same look, no per-frame blur cost */
+.header-glass{position:absolute;inset:0;z-index:0;background:linear-gradient(180deg,#050d22,#061028);border-bottom:1px solid var(--line);opacity:0;transition:opacity .5s var(--ease-out),transform .7s var(--ease-out)}
+.header-progress{position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,var(--blue-lo),var(--cyan) 55%,var(--gold-hi));transform:scaleX(0);transform-origin:left}
+.site-header.is-scrolled .header-glass{opacity:1}
+/* static tiers (no JS / script.js never booted) can't toggle .is-scrolled: keep the bar solid */
+:is(html:not(.js),html.no-anim:not(.ready)) .header-glass{opacity:1}
+/* the header hides by moving its children, never itself (a transformed header would trap the fixed mobile menu) */
+.site-header>.brand,.site-header>.menu-toggle{position:relative;z-index:2;transition:transform .7s var(--ease-out)}
+.site-header.is-hidden>.header-glass,.site-header.is-hidden>.brand,.site-header.is-hidden>.menu-toggle{transform:translate3d(0,-120px,0)}
+/* the empty header box stays put while hidden: let clicks / taps fall through to the page */
+.site-header.is-hidden{pointer-events:none}
+@media (min-width:851px){
+  .site-header>.nav{transition:transform .7s var(--ease-out)}
+  .site-header.is-hidden>.nav{transform:translate3d(0,-120px,0)}
+}
+
+.brand{display:flex;align-items:center;gap:12px;min-height:44px}
+.brand-mark{position:relative;width:46px;height:44px;flex:none;transition:transform 1.1s var(--ease-out)}
+.brand-mark::before{content:"";position:absolute;left:10%;top:6%;width:56%;height:56%;border-radius:50%;background:radial-gradient(circle,rgba(249,198,27,.45),transparent 70%);filter:blur(6px);opacity:.8}
+.brand-mark img{position:relative;width:100%;height:100%;object-fit:contain}
+/* the wordmark, after the STARFALL INC. banner: chunky rounded cyan with a dark outline drop */
+.brand-word{display:flex;align-items:baseline;gap:7px;font:700 22px/1 var(--f-round);letter-spacing:.035em;color:var(--ice);text-shadow:0 2px 0 var(--drop),0 0 22px rgba(56,200,240,.35)}
+.brand-word small{font:600 11px/1 var(--f-round);letter-spacing:.16em;color:var(--muted);text-shadow:none}
+@media (hover:hover){.brand:hover .brand-mark{transform:translate(-3px,-3px) rotate(-8deg)}}
+
+.nav{position:relative;z-index:1;display:flex;align-items:center;gap:22px}
+.nav-list{display:flex;align-items:center;gap:2px;list-style:none;margin:0;padding:0}
+.nav-link{position:relative;display:flex;align-items:flex-start;gap:6px;min-height:44px;padding:16px 13px 14px;font:500 11px/1 var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--text-2);transition:color .4s var(--ease-out)}
+.nav-num{font:700 10px/1 var(--f-round);letter-spacing:.04em;color:var(--gold);opacity:.65;transform:translateY(-5px);transition:opacity .4s}
+.nav-link::after{content:"";position:absolute;left:13px;right:13px;bottom:8px;height:1px;background:linear-gradient(90deg,var(--cyan),var(--gold-hi));transform:scaleX(0);transform-origin:right;transition:transform .6s var(--ease-out)}
+.nav-link:focus-visible,.nav-link.is-active{color:#fff}
+.nav-link.is-active .nav-num{opacity:1}
+.nav-link:focus-visible::after,.nav-link.is-active::after{transform:scaleX(1);transform-origin:left}
+/* hover only where hover is real, so a tapped link on a touch tablet never stays "lit" */
+@media (hover:hover){
+  .nav-link:hover{color:#fff}
+  .nav-link:hover::after{transform:scaleX(1);transform-origin:left}
+}
+.nav-cta{position:relative;isolation:isolate;overflow:hidden;display:inline-flex;align-items:center;gap:12px;min-height:46px;padding:0 7px 0 20px;border:1px solid rgba(249,198,27,.5);border-radius:999px;font:600 15px/1 var(--f-round);letter-spacing:.015em;color:#fff;background:rgba(249,198,27,.07);transition:color .45s var(--ease-out),border-color .45s var(--ease-out)}
+.nav-cta-fill{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,#ffe066,var(--gold) 52%,#f3a90f);border-radius:inherit;transform:translateY(101%);transition:transform .65s var(--ease-out)}
+.nav-cta-icon{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--gold);color:#07132e;font-size:13px;transition:background .45s var(--ease-out),color .45s var(--ease-out),transform .6s var(--ease-out)}
+@media (hover:hover){
+  .nav-cta:hover{color:#07132e;border-color:var(--gold)}
+  .nav-cta:hover .nav-cta-fill{transform:none}
+  .nav-cta:hover .nav-cta-icon{background:#07132e;color:var(--gold-hi);transform:rotate(45deg)}
+}
+.nav-kicker,.nav-foot{display:none}
+.menu-toggle{display:none}
+
+/* 5. Sky + hero ------------------------------------------------------------ */
+/* the sky: fixed, painted once; the canvas redraws only its own bitmap */
+.sky{position:fixed;left:0;top:0;width:100%;height:100vh;height:100lvh;z-index:-1;pointer-events:none;overflow:hidden;background:radial-gradient(120% 70% at 50% 0%,#0a1d45 0%,rgba(10,29,69,0) 70%),linear-gradient(180deg,#050d22 0%,#06112b 55%,#081634 100%)}
+.sky-glow{position:absolute;border-radius:50%}
+.sky-glow-a{width:70vmax;height:70vmax;right:-28vmax;top:-30vmax;background:radial-gradient(circle,rgba(26,127,230,.22),rgba(26,127,230,.06) 40%,transparent 66%)}
+.sky-glow-b{width:60vmax;height:60vmax;left:-26vmax;bottom:-34vmax;background:radial-gradient(circle,rgba(56,200,240,.12),rgba(15,79,196,.05) 42%,transparent 66%)}
+.sky-canvas{position:absolute;inset:0;width:100%;height:100%}
+/* CSS stars: the sky without JS (or before the canvas paints its first frame) */
+.sky-dots{position:absolute;inset:0;opacity:.85;background:var(--stars)}
+html.sky-on .sky-dots{opacity:0;transition:opacity 1.2s} /* the canvas has painted its first frame */
+
+.hero{position:relative;isolation:isolate;overflow:hidden;min-height:max(100svh,720px);display:flex;flex-direction:column;padding:calc(var(--header-h) + 20px) var(--pad-x) 0}
+/* desktop: copy column left, the mark right; reading order eyebrow → title → copy → actions */
+.hero-inner{flex:1;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"eyebrow mark" "title mark" "copy mark" "actions mark";align-content:center;column-gap:clamp(30px,4vw,70px);padding:20px 0 44px}
+.hero-eyebrow{grid-area:eyebrow;align-self:end}
+.hero-title{grid-area:title;font-size:clamp(42px,6.7vw,112px);font-weight:800;line-height:.95;letter-spacing:-.045em;margin:28px 0 30px;margin-left:-.05em}
+.hero-title em{font-size:1.08em;margin-right:.04em}
+/* line masks reach a little further left / down so the italic's overhang and descender (g) are never clipped */
+/* (padding wide enough that the accent's glow fades out before the mask's edge) */
+.hero-title .line-mask,h2 .line-mask{padding:.3em .4em .34em;margin:-.3em -.4em -.34em}
+/* (as grid items their negative margins can't collapse into each other or the heading's own margins:
+   a split heading keeps exactly the height of the plain one, so building a reveal never shifts the page) */
+:is(.hero-title,h2):has(>.line-mask){display:grid}
+.hero-copy{grid-area:copy;max-width:470px;color:var(--muted);font-size:17px;line-height:1.72}
+.hero-copy,.section-intro,.game-desc,.creator-copy>p,.contact-card>p{text-wrap:pretty}
+.hero-eyebrow{text-wrap:balance}
+/* keyboard focus is never drawn on the half-faded (scrubbed) hero copy */
+.hero-inner:has(:focus-visible){opacity:1!important}
+.hero-actions{grid-area:actions;align-self:start;display:flex;gap:12px;flex-wrap:wrap;margin-top:38px}
+
+/* the mark: chart rings + halo + comet trail + star (two layers of the real logo) */
+.hero-mark{grid-area:mark;align-self:center;justify-self:end;position:relative;width:clamp(300px,40vw,600px);aspect-ratio:1}
+.mark-depth{position:absolute;inset:0}
+.mark-halo{position:absolute;inset:-18%;border-radius:50%;background:radial-gradient(circle at 37% 37%,rgba(255,214,90,.3) 0%,rgba(249,198,27,.08) 16%,transparent 32%),radial-gradient(circle at 54% 54%,rgba(56,200,240,.22) 0%,rgba(26,127,230,.1) 30%,transparent 58%)}
+.mark-chart-wrap{position:absolute;inset:0}
+.mark-chart{position:absolute;inset:0;width:100%;height:100%;overflow:visible;animation:spin 180s linear infinite}
+.mark-chart circle,.mark-chart path{fill:none;stroke:rgba(150,210,255,.16);stroke-width:1;vector-effect:non-scaling-stroke}
+.mark-chart .chart-ticks{stroke:rgba(150,210,255,.22);stroke-width:7;stroke-dasharray:.35 4.65;vector-effect:none}
+.mark-chart .chart-ring-in{stroke:rgba(150,210,255,.1)}
+.mark-chart .chart-dash{stroke:rgba(249,198,27,.22);stroke-dasharray:2 7}
+.mark-chart .chart-axis{stroke:rgba(150,210,255,.2)}
+.mark-art{position:absolute;left:5%;top:6%;width:90%;aspect-ratio:760/735}
+.mark-trail,.mark-star{position:absolute;inset:0;width:100%;height:100%}
+.mark-trail{filter:drop-shadow(0 0 18px rgba(56,200,240,.45))}
+.mark-star-wrap,.mark-tail{position:absolute;inset:0}
+.mark-flash{position:absolute;left:30.3%;top:30.2%;width:80%;aspect-ratio:1;margin:-40% 0 0 -40%;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(circle,rgba(255,255,255,.9) 0%,rgba(255,226,122,.5) 14%,rgba(95,211,255,.16) 38%,transparent 64%)}
+.mark-star{transform-origin:30.3% 30.2%;filter:drop-shadow(0 0 22px rgba(249,198,27,.55));animation:starBob 7s ease-in-out infinite}
+@keyframes starBob{0%,100%{transform:none}50%{transform:translate(-.6%,-.9%) rotate(-2.5deg)}}
+/* light running down the comet's tail, clipped to the trail's own shape */
+.mark-shine{position:absolute;inset:0;overflow:hidden;-webkit-mask:url(assets/brand/starfall-trail.webp) center/100% 100% no-repeat;mask:url(assets/brand/starfall-trail.webp) center/100% 100% no-repeat;mix-blend-mode:plus-lighter;opacity:.9}
+.mark-shine::before{content:"";position:absolute;left:-60%;top:-60%;width:90%;height:90%;background:linear-gradient(135deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);animation:shine 5.5s var(--ease-io) infinite}
+@keyframes shine{0%,25%{transform:translate(0,0)}75%,100%{transform:translate(185%,185%)}}
+.mark-glint{position:absolute;left:21.2%;top:1.6%;width:9%;aspect-ratio:1;background:radial-gradient(circle,#fff 0 8%,transparent 9%),linear-gradient(#fff,#fff) center/6% 100% no-repeat,linear-gradient(#fff,#fff) center/100% 6% no-repeat;clip-path:var(--sparkle);filter:drop-shadow(0 0 6px #fff);animation:twinkle 3.6s ease-in-out infinite}
+
+.hero-foot{position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:22px 0 30px;border-top:1px solid var(--line)}
+.scroll-note{display:flex;align-items:center;gap:16px;font:600 10px/1 var(--f-body);letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+.scroll-line{position:relative;width:64px;height:1px;background:var(--line-2);overflow:hidden}
+.scroll-line::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,var(--cyan));transform:translateX(-100%);animation:scrollLine 2.4s var(--ease-io) infinite}
+@keyframes scrollLine{0%{transform:translateX(-100%)}55%{transform:translateX(0)}100%{transform:translateX(101%)}}
+.hero-live{display:inline-flex;align-items:center;gap:12px;min-height:44px;padding:0 18px;border:1px solid var(--line-2);border-radius:999px;background:rgba(8,22,52,.5);font:600 10.5px/1 var(--f-body);letter-spacing:.16em;text-transform:uppercase;color:var(--text-2);transition:border-color .4s var(--ease-out),background .4s var(--ease-out)}
+.hero-live-sep{color:var(--dim)}
+.hero-live-muted{color:var(--muted)}
+@media (hover:hover){.hero-live:hover{border-color:rgba(95,211,255,.5);background:rgba(95,211,255,.08)}}
+
+/* 6. Rift (energy tear) ---------------------------------------------------- */
+/* a planet's limb catches the light at the top; a torn band of comet light carries the marquee */
+.rift{position:relative;z-index:1;overflow:hidden;padding:clamp(90px,10vw,160px) 0 clamp(56px,6vw,96px)}
+.limb{position:absolute;inset:0;overflow:hidden;pointer-events:none;-webkit-mask-image:linear-gradient(180deg,#000 30%,transparent 88%);mask-image:linear-gradient(180deg,#000 30%,transparent 88%)}
+.limb-planet{position:absolute;left:50%;top:clamp(36px,4vw,70px);width:max(2000px,180vw);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle at 50% 0%,#0f2a62 0%,#0a1b44 7%,var(--bg) 20%);box-shadow:inset 0 2px 0 rgba(200,247,255,.8),inset 0 22px 50px -16px rgba(56,200,240,.55),0 -14px 70px -8px rgba(56,200,240,.4)}
+/* glow behind the tear: a static gradient, never a filter on the moving band */
+.rift::before{content:"";position:absolute;left:-10%;right:-10%;top:58%;height:clamp(200px,24vw,380px);transform:translateY(-50%) rotate(-3deg);background:radial-gradient(50% 50% at 50% 50%,rgba(56,200,240,.3),rgba(26,127,230,.1) 50%,transparent 75%);pointer-events:none}
+.rift-band{position:relative;margin:0 -6vw;padding:clamp(20px,2.4vw,34px) 0;transform:rotate(-3deg);background:
+  linear-gradient(180deg,transparent 22%,rgba(255,255,255,.55) 22%,rgba(255,255,255,.55) calc(22% + 2px),transparent calc(22% + 2px),transparent 81%,rgba(255,255,255,.4) 81%,rgba(255,255,255,.4) calc(81% + 1.5px),transparent calc(81% + 1.5px)),
+  linear-gradient(90deg,#0f4fc4 0%,#1a7fe6 16%,#38c8f0 42%,#8ee8ff 52%,#38c8f0 62%,#1a7fe6 84%,#0f4fc4 100%);
+  /* torn edges (script.js reads this polygon and scrubs the tear open from a hairline) */
+  clip-path:polygon(-1% 11.6%,2.9% 1.1%,6.8% 3.2%,10.8% 3.9%,14.7% .4%,18.6% 2.6%,22.5% 2.7%,26.5% 3.1%,30.4% .4%,34.3% 15.8%,38.2% 4.7%,42.2% 4.5%,46.1% 4.8%,50% 9.8%,53.9% 15.7%,57.8% 2.4%,61.8% 13.7%,65.7% .5%,69.6% .8%,73.5% 1.9%,77.5% 9.9%,81.4% 11.1%,85.3% 15%,89.2% .8%,93.2% 6.7%,97.1% 1.7%,101% 5.9%,101% 84.8%,97.1% 92.6%,93.2% 97.3%,89.2% 98.3%,85.3% 98.2%,81.4% 87%,77.5% 96.4%,73.5% 95.6%,69.6% 94.8%,65.7% 90.3%,61.8% 95%,57.8% 92.5%,53.9% 94%,50% 91.9%,46.1% 97.3%,42.2% 93.9%,38.2% 93.8%,34.3% 97.5%,30.4% 98.7%,26.5% 85.5%,22.5% 95.8%,18.6% 96.2%,14.7% 86.2%,10.8% 96.3%,6.8% 90%,2.9% 99.4%,-1% 97.3%)}
+.rift-track{display:flex;width:max-content;animation:marquee 52s linear infinite}
+html.marquee-js .rift-track{will-change:transform} /* JS writes its transform every frame: keep it a compositor layer */
+/* the tear: script.js scales the band open (transform, from a hairline) and counter-scales .rift-lean, which also
+   carries the lean into fast scrolls, so the 3000px+ text track only ever translates and nothing re-rasterises */
+html.motion:not(.no-anim) .rift-band,html.marquee-js .rift-lean{will-change:transform}
+.rift-group{flex:none;margin:0;padding-right:.6em;white-space:nowrap;font:700 clamp(36px,5.2vw,86px)/1.1 var(--f-round);letter-spacing:0;text-transform:uppercase;color:var(--ink)}
+.rift-star{display:inline-block;width:.42em;height:.42em;margin:0 .5em;vertical-align:.12em;background:#fff;clip-path:var(--sparkle)}
+@keyframes marquee{to{transform:translate3d(-50%,0,0)}}
+
+/* 7. Games ----------------------------------------------------------------- */
+.section{position:relative;width:100%;max-width:calc(var(--max) + var(--gutter) * 2);margin:0 auto;padding:clamp(110px,13vw,190px) var(--gutter)}
+/* native anchor offset (also keeps the browser's own hash jump on load under the header) */
+:is(#games,#creator,#community,#contact){scroll-margin-top:-16px} /* + html scroll-padding = exactly the header height */
+h2{font-size:clamp(38px,5.4vw,88px)}
+.section-heading{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-end;gap:50px;margin-bottom:clamp(48px,6vw,84px)}
+.section-intro{max-width:320px;color:var(--muted);font-size:15.5px;line-height:1.7;padding-bottom:12px}
+.c-games{right:var(--gutter);top:clamp(20px,3vw,50px);width:min(360px,30vw);height:150px}
+/* pacing: the rift leads straight into the portal, and the creator follows the set piece closely */
+.games-section{padding-top:clamp(60px,7vw,110px);padding-bottom:clamp(70px,7vw,110px)}
+.creator-section{padding-top:clamp(70px,8vw,130px);padding-bottom:clamp(80px,9vw,140px)}
+.community-section{padding-top:clamp(80px,9vw,140px);padding-bottom:clamp(70px,7vw,110px)}
+.contact-section{padding-top:clamp(70px,8vw,130px)}
+
+.game-stage{position:relative}
+.game-card{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1.22fr) minmax(0,.78fr);border-radius:28px;border:1px solid var(--line);background:linear-gradient(160deg,#0d2152 0%,#081634 55%,#061029 100%);overflow:hidden;box-shadow:0 60px 120px -60px rgba(0,0,0,.9),0 0 80px -40px rgba(56,200,240,.25)}
+.game-card::before{content:"";position:absolute;inset:0;z-index:3;border-radius:inherit;pointer-events:none;box-shadow:inset 0 1px 0 rgba(166,233,255,.12)}
+/* pointer-depth layers move every frame under the cursor: compositor-only */
+@media (hover:hover) and (pointer:fine){html.motion .game-card [data-depth],html.motion .card-light{will-change:transform}}
+.card-light{position:absolute;z-index:4;left:0;top:0;width:640px;height:640px;margin:-320px 0 0 -320px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(166,233,255,.12),rgba(95,211,255,.035) 40%,transparent 68%);opacity:0;transition:opacity .6s var(--ease-out)}
+.game-card.is-hover .card-light{opacity:1}
+
+.game-art{position:relative;min-height:600px;overflow:hidden;background:var(--bg-2);border-right:1px solid var(--line)}
+.game-art-inner,.portal-iris,.game-scene{position:absolute;inset:0}
+/* .portal-iris: script.js scrubs a clip-path circle open on it, from a small rift to full bleed (no clip without motion) */
+/* the rift's rim: one ring of light, scaled (transform only) to sit on the iris edge as it opens */
+.portal-rim{position:absolute;left:50%;top:50%;width:400px;height:400px;margin:-200px 0 0 -200px;border-radius:50%;pointer-events:none;opacity:0;box-shadow:0 0 0 1.5px rgba(240,253,255,.95),0 0 16px 3px rgba(120,225,255,.8),0 0 60px 8px rgba(26,127,230,.45),inset 0 0 18px 3px rgba(120,225,255,.6)}
+/* the waiting rift's lens flare: an anamorphic streak through the seed, gone once the portal opens */
+.rift-flare{position:absolute;left:50%;top:50%;width:min(92%,900px);height:2px;margin:-1px 0 0 calc(min(92%,900px) / -2);pointer-events:none;opacity:0;background:linear-gradient(90deg,transparent,rgba(56,200,240,.35) 22%,rgba(220,250,255,.95) 50%,rgba(56,200,240,.35) 78%,transparent);box-shadow:0 0 14px 2px rgba(56,200,240,.45)}
+.rift-flare::before{content:"";position:absolute;left:50%;top:50%;width:2px;height:240px;margin:-120px 0 0 -1px;background:linear-gradient(180deg,transparent,rgba(220,250,255,.8) 50%,transparent)}
+.rift-flare::after{content:"";position:absolute;left:50%;top:50%;width:420px;height:90px;margin:-45px 0 0 -210px;border-radius:50%;background:radial-gradient(closest-side,rgba(142,232,255,.28),rgba(26,127,230,.1) 60%,transparent)}
+
+/* inside the portal: a vortex of comet light, a warp tunnel, floating worlds in brand hues, the star at the core */
+.vortex{position:absolute;inset:-25%;overflow:hidden;background:radial-gradient(circle 600px at 50% 50%,#f2fdff 0%,#9eeaff 2.5%,#38c8f0 7%,#1a7fe6 16%,#0f4fc4 27%,#0b2257 46%,#071533 70%,var(--bg) 100%)}
+.vortex-swirl{position:absolute;left:50%;top:50%;width:min(87%,2000px);aspect-ratio:1;transform:translate(-50%,-50%);background:url(assets/fx/vortex-swirl.webp) center/100% 100% no-repeat;animation:swirl 48s linear infinite} /* the conic swirl with its radial fade baked in: a plain image turning, no mask pass per frame */
+@keyframes swirl{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+.tunnel{position:absolute;left:50%;top:50%;width:0;height:0}
+/* three warp rings, each a pre-blurred ring image (no box-shadow glow to rasterise at every scale) */
+.tunnel i{position:absolute;left:-300px;top:-300px;width:600px;height:600px;background:url(assets/fx/warp-ring.webp) center/100% 100% no-repeat;opacity:0;animation:warp 5.4s linear infinite}
+.tunnel i:nth-child(2){animation-delay:-1.8s}
+.tunnel i:nth-child(3){animation-delay:-3.6s}
+@keyframes warp{0%{transform:scale(.06);opacity:0}14%{opacity:.85}66%{opacity:.35}92%{opacity:0}100%{transform:scale(2);opacity:0}}
+.worlds{position:absolute;inset:0}
+/* in the desktop set piece the worlds keep near the centre, so they stay in view once the art slides aside */
+.game-card.is-cinematic .worlds{left:max(21%,50% - 400px);right:max(21%,50% - 400px)}
+.world{position:absolute;display:block;border-radius:50%}
+.world::before{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 32% 28%,#fff 0,var(--hi) 9%,var(--c) 40%,var(--lo) 74%,#040a1c 100%);box-shadow:0 0 44px -4px var(--glow),inset -6px -8px 18px rgba(2,8,26,.45);animation:bob 7s ease-in-out infinite;animation-delay:var(--d,0s)}
+/* rings around a world: a flattened ellipse riding the same bob */
+.world i{position:absolute;left:-58%;right:-58%;top:36%;bottom:36%;border-radius:50%;border:2px solid var(--ring);transform:rotate(-16deg);animation:bobRing 7s ease-in-out infinite;animation-delay:var(--d,0s)}
+@keyframes bob{0%,100%{transform:translate3d(0,0,0)}50%{transform:translate3d(0,-12px,0)}}
+@keyframes bobRing{0%,100%{transform:rotate(-16deg) translate3d(0,0,0)}50%{transform:rotate(-16deg) translate3d(-3px,-11.5px,0)}}
+/* brand hues only: cyan, gold, electric blue, ice */
+.w1{--c:#38c8f0;--hi:#c9f6ff;--lo:#0f4fc4;--glow:rgba(56,200,240,.55);--ring:rgba(190,245,255,.55);width:92px;height:92px;left:14%;top:17%}
+.w2{--c:#f9c61b;--hi:#fff1b3;--lo:#c25a06;--glow:rgba(249,198,27,.5);--ring:rgba(255,226,140,.5);--d:-2.4s;width:64px;height:64px;right:14%;top:22%}
+.w3{--c:#1a7fe6;--hi:#bfe3ff;--lo:#0b2a7a;--glow:rgba(26,127,230,.55);--d:-4s;width:42px;height:42px;left:36%;top:12%}
+.w4{--c:#bfeeff;--hi:#ffffff;--lo:#2a6fb8;--glow:rgba(190,240,255,.45);--d:-1.2s;width:72px;height:72px;right:20%;bottom:15%}
+.w5{--c:#ffd75a;--hi:#fff6d6;--lo:#d07a0c;--glow:rgba(255,215,90,.45);--d:-5.2s;width:26px;height:26px;left:24%;bottom:24%}
+.portal-core{position:absolute;left:50%;top:50%;width:0;height:0}
+.core-glow{position:absolute;left:-150px;top:-150px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95) 0,rgba(190,245,255,.6) 12%,rgba(56,200,240,.2) 34%,transparent 64%)}
+.core-star{position:absolute;left:-48px;top:-50px;width:96px;height:auto;max-width:none;animation:spin 16s linear infinite}
+.portal-core::before{content:"";position:absolute;left:-75px;top:-75px;width:150px;height:150px;border-radius:50%;background:radial-gradient(circle,rgba(255,214,90,.5),rgba(255,214,90,.14) 38%,transparent 62%)} /* the star's gold glow, static (a filter on the turning star would be re-blurred every frame) */
+.game-sparks{position:absolute;inset:0}
+.game-sparks i{position:absolute;width:12px;height:12px;--c:#fff;animation:twinkle 3.4s ease-in-out infinite}
+/* glow + sparkle as two static pseudo-elements (no filter re-blurred every frame of the twinkle) */
+.game-sparks i::before{content:"";position:absolute;inset:-90%;border-radius:50%;background:radial-gradient(circle,rgba(166,233,255,.6),rgba(166,233,255,.12) 40%,transparent 62%)}
+.game-sparks i::after{content:"";position:absolute;inset:0;background:var(--c);clip-path:var(--sparkle)}
+.game-sparks i:nth-child(1){left:26%;top:30%}
+.game-sparks i:nth-child(2){left:70%;top:14%;animation-delay:.8s;width:9px;height:9px}
+.game-sparks i:nth-child(3){left:80%;top:56%;animation-delay:1.6s}
+.game-sparks i:nth-child(4){left:12%;top:52%;animation-delay:2.2s;width:8px;height:8px}
+.game-sparks i:nth-child(5){left:58%;top:8%;animation-delay:1.2s;width:7px;height:7px;--c:var(--gold-hi)}
+.game-sparks i:nth-child(6){left:42%;top:76%;animation-delay:2.8s;width:9px;height:9px;--c:var(--gold-hi)}
+
+.game-badge{position:absolute;z-index:2;top:26px;left:26px;display:flex;align-items:center;gap:9px;padding:10px 15px;border:1px solid rgba(190,245,255,.25);border-radius:999px;background:rgba(5,13,34,.62);font:600 13px/1 var(--f-round);letter-spacing:.03em;color:var(--text)}
+.game-badge::before{content:"";width:10px;height:10px;background:var(--gold);clip-path:var(--sparkle)}
+/* the game's title as a game logo: chunky rounded cyan with a stacked dark outline drop, after the STARFALL INC. banner */
+.game-art-label{position:absolute;z-index:2;left:32px;bottom:26px;display:flex;flex-direction:column;align-items:flex-start;pointer-events:none}
+/* quiet scrim behind the letters; in the set piece it arrives with the card's surface (--chrome) */
+.game-art-label::before{content:"";position:absolute;z-index:-1;inset:-50px -80px -40px -50px;background:radial-gradient(ellipse at 30% 70%,rgba(5,13,34,.8),transparent 70%);pointer-events:none;opacity:var(--chrome,1)}
+.game-art-label .lm{display:block;clip-path:inset(-40% -25% 0 -25%);padding:.2em .4em .3em .2em;margin:-.2em -.4em -.3em -.2em} /* the reveal mask clips only the bottom edge: the title's glow is never boxed in */
+.game-art-label .lm>*{display:block}
+.game-art-label .lm>span{font:700 16px/1.4 var(--f-round);letter-spacing:.55em;text-transform:uppercase;color:var(--gold-hi);text-shadow:0 2px 0 rgba(8,48,110,.9)}
+.game-art-label strong{font:700 clamp(46px,5vw,80px)/.95 var(--f-round);letter-spacing:.005em;text-transform:uppercase;color:#7fe0fb;text-shadow:0 3px 0 #0a2f72,0 6px 0 #061a45,0 0 18px rgba(56,200,240,.45)}
+.game-sheen{position:absolute;z-index:3;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 30%,rgba(190,235,255,.08) 45%,transparent 60%);transform:translateX(-100%)}
+.game-card.is-hover .game-sheen{transform:translateX(100%);transition:transform 1.4s var(--ease-out)}
+
+.game-info{position:relative;z-index:1;padding:clamp(32px,4vw,58px);display:flex;flex-direction:column;justify-content:center}
+.game-live{color:#bff0d6;margin-bottom:18px}
+/* the art's big PET / DIMENSIONS lockup is the visual title at every width: the h3 stays for assistive tech */
+.game-info h3{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.game-desc{color:var(--muted);line-height:1.7;font-size:16.5px;max-width:420px}
+/* the one number we know, promoted to a hero stat */
+.game-stat{display:flex;align-items:baseline;gap:12px;margin-top:22px;color:var(--text-2);font:600 18px/1.2 var(--f-round)}
+.game-stat span{white-space:nowrap}
+.game-stat{flex-wrap:wrap;row-gap:4px} /* very narrow: the label drops below the number, never beside it on two lines */
+.game-stat strong{font:800 clamp(46px,4.2vw,64px)/1 var(--f-display);letter-spacing:-.045em;background:linear-gradient(180deg,#fff3b8 0%,var(--gold) 55%,var(--orange) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--gold)}
+.game-meta{display:grid;grid-template-columns:repeat(3,auto);margin:26px 0 28px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.game-meta>div{padding:16px 0 16px 16px;border-left:1px solid var(--line)}
+.game-meta>div:first-child{padding-left:0;border-left:0}
+.game-meta dt{font:600 10px/1 var(--f-body);letter-spacing:.22em;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.game-meta dd{font:600 15.5px/1.2 var(--f-round);letter-spacing:.01em;white-space:nowrap}
+.game-meta .live{display:flex;align-items:center;gap:9px;color:#d5f5e3}
+/* keyboard focus is never inside an invisible (still-scrubbing) item */
+.game-info>:focus-visible,.game-info>:focus-within{opacity:1!important;transform:none!important}
+.game-card.is-cinematic .game-info:has(:focus-visible){clip-path:none!important}
+
+/* desktop set piece (class added by JS): the art spans the whole card; the rift tears open, then slides aside */
+.game-card.is-cinematic{height:min(720px,calc(100svh - var(--header-h) * 2 - 20px));min-height:540px;background:transparent;border-color:rgb(160 205 255 / calc(.1 * var(--chrome,1)));box-shadow:none}
+/* the surface is a layer GSAP fades in (--chrome 0→1) once the portal is open, so the rift first floats in the night sky */
+.game-card.is-cinematic::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:inherit;background:linear-gradient(160deg,#0d2152 0%,#081634 55%,#061029 100%);opacity:var(--chrome,1);pointer-events:none}
+.game-card.is-cinematic::before{opacity:var(--chrome,1)}
+.game-card.is-cinematic .game-art{position:absolute;inset:0;z-index:0;min-height:0;border-right:0;background:transparent;will-change:clip-path}
+/* own layers while scrubbed, so moving the aperture never repaints the scene */
+.game-card.is-cinematic .game-art-inner,.game-card.is-cinematic .game-scene,.game-card :is(.portal-rim,.rift-flare){will-change:transform}
+.game-card.is-cinematic .game-info{grid-column:2}
+.game-card.is-cinematic .game-desc{font-size:clamp(16.5px,1.3vw,19px);color:var(--text-2)}
+/* smaller screens (class added by JS): the rift waits in a dark card and tears open as you scroll */
+.game-card.is-iris .game-art{background:radial-gradient(ellipse 60% 55% at 50% 50%,#0b1d45,var(--bg) 80%)}
+
+/* 8. Creator --------------------------------------------------------------- */
+.creator-section{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(48px,8vw,130px);align-items:center;overflow-x:clip} /* the spinning orbit's rotated box never widens the page */
+.c-creator{inset:0;width:100%;height:100%;z-index:0}
+.creator-portrait{position:relative;width:min(100%,460px);aspect-ratio:1;justify-self:center;margin-bottom:40px}
+.portrait-photo{position:absolute;inset:13%;border-radius:50%;overflow:hidden;background:#cfe9fb;box-shadow:0 0 0 1px rgba(166,233,255,.4),0 0 70px -6px rgba(95,211,255,.55),0 40px 80px -30px rgba(0,0,0,.8)}
+.portrait-photo img{width:100%;height:100%;object-fit:cover}
+/* a glowing ring of cyan light turning around the photo */
+.portrait-ring{position:absolute;inset:9.5%;border-radius:50%;background:conic-gradient(from 210deg,rgba(95,211,255,0),var(--cyan) 22%,#fff 30%,var(--blue) 46%,rgba(15,79,196,0) 62%,rgba(95,211,255,0));-webkit-mask:radial-gradient(circle,transparent 69%,#000 70%,#000 71.4%,transparent 73%);mask:radial-gradient(circle,transparent 69%,#000 70%,#000 71.4%,transparent 73%);filter:drop-shadow(0 0 8px rgba(95,211,255,.9));animation:spin 12s linear infinite}
+/* an orbit (tilted) with the Starfall star travelling on it */
+.portrait-orbit{position:absolute;inset:0;border-radius:50%;border:1px dashed rgba(166,233,255,.18);animation:spin 26s linear infinite}
+.portrait-orbit-star{position:absolute;left:50%;top:0;width:44px;height:46px;margin:-23px 0 0 -22px;background:url(assets/brand/starfall-star-head.webp) center/contain no-repeat;filter:drop-shadow(0 0 10px rgba(249,198,27,.8));animation:spin 26s linear infinite reverse}
+.portrait-tag{position:absolute;left:0;right:0;bottom:-34px;width:max-content;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 26px;border:1px solid var(--line-2);border-radius:999px;background:rgba(5,13,34,.82);white-space:nowrap;box-shadow:0 20px 40px -20px rgba(0,0,0,.8)}
+.portrait-tag strong{font:700 19px/1 var(--f-round);letter-spacing:.02em;color:var(--ice);text-shadow:0 2px 0 var(--drop)}
+.portrait-tag span{font:600 9.5px/1 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.creator-copy{position:relative;z-index:1}
+.creator-copy h2{font-size:clamp(36px,4.6vw,76px);margin-bottom:36px}
+.creator-copy>p{color:var(--muted);line-height:1.8;font-size:16.5px;max-width:540px}
+.creator-copy>p+p{margin-top:18px}
+.facts{position:relative;z-index:0;list-style:none;margin-top:44px;border-top:1px solid var(--line)}
+.facts li{position:relative;border-bottom:1px solid var(--line);overflow:hidden}
+/* each row is a link: Play / Watch / Join */
+.facts a{display:grid;grid-template-columns:56px minmax(0,.9fr) minmax(0,1.3fr) 24px;align-items:center;min-height:70px;padding:0 6px}
+.facts a:focus-visible{outline-offset:-3px;border-radius:6px}
+.facts li::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,rgba(95,211,255,.1),rgba(95,211,255,0));transform:scaleX(0);transform-origin:left;transition:transform .7s var(--ease-out)}
+.f-num{font:700 15px/1 var(--f-round);letter-spacing:.04em;color:var(--gold);transition:transform .6s var(--ease-out)}
+.facts strong{font:600 11.5px/1.2 var(--f-display);letter-spacing:.14em;text-transform:uppercase;transition:transform .6s var(--ease-out)}
+.facts small{color:var(--muted);font-size:14.5px;transition:color .5s}
+.f-go{justify-self:end;font:600 15px/1 var(--f-body);color:var(--cyan);opacity:.6;transition:transform .6s var(--ease-out),opacity .6s,color .6s}
+@media (hover:hover){
+  .facts li:hover::before{transform:scaleX(1)}
+  .facts li:hover .f-num{transform:translateX(6px)}
+  .facts li:hover strong{transform:translateX(10px)}
+  .facts li:hover small{color:var(--text-2)}
+  .facts li:hover .f-go{opacity:1;color:var(--gold-hi);transform:translate(3px,-3px)}
+}
+
+/* 9. Quote ----------------------------------------------------------------- */
+.quote-section{position:relative;isolation:isolate;max-width:1240px;margin:0 auto;padding:clamp(30px,5vw,70px) var(--gutter) clamp(40px,5vw,80px);text-align:center}
+.quote-glow{position:absolute;z-index:-1;left:50%;top:45%;width:min(90vw,900px);height:420px;transform:translate(-50%,-50%);background:radial-gradient(ellipse at center,rgba(56,200,240,.1),transparent 65%);pointer-events:none}
+.quote-section blockquote{font:800 clamp(36px,6.2vw,100px)/1 var(--f-display);letter-spacing:-.045em;text-transform:uppercase;margin:clamp(40px,5vw,64px) 0 26px;text-wrap:balance}
+.quote-section blockquote em{font-size:1.08em;color:var(--gold-hi);text-shadow:0 .055em 0 #7a3405,0 0 .5em rgba(249,198,27,.45)}
+.q-star{display:inline-block;width:.42em;height:.42em;margin-left:.12em;vertical-align:.55em;background:var(--gold);clip-path:var(--sparkle);filter:drop-shadow(0 0 10px rgba(249,198,27,.9))}
+.quote-cite{display:flex;align-items:center;justify-content:center;gap:12px;font:600 11px/1.4 var(--f-body);letter-spacing:.26em;text-transform:uppercase;color:var(--dim);margin-bottom:clamp(40px,5vw,64px)}
+.quote-cite::before,.quote-cite::after{content:"";width:28px;height:1px;background:var(--line-2)}
+.quote-line{height:1px;background:linear-gradient(90deg,transparent,rgba(95,211,255,.45),transparent)}
+
+/* 10. Community ------------------------------------------------------------ */
+.community-grid{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(16px,2vw,28px)}
+.c-link{left:0;right:0;width:100%;top:-74px;height:74px}
+.social-card{--brand:var(--cyan);--brand-rgb:95,211,255;position:relative;isolation:isolate;overflow:hidden;display:flex;flex-direction:column;align-items:flex-start;min-height:360px;padding:clamp(28px,3vw,44px);border-radius:28px;border:1px solid var(--line);background:linear-gradient(160deg,rgba(13,33,82,.88),rgba(6,16,41,.92));box-shadow:0 40px 90px -50px rgba(0,0,0,.9);transition:border-color .6s var(--ease-out),translate .8s var(--ease-out),box-shadow .8s var(--ease-out)} /* hover uses the individual `translate`/`rotate` properties: GSAP owns `transform` */
+.social-yt{--brand:#ff1f3d;--brand-rgb:255,51,71}
+.social-dc{--brand:#5865f2;--brand-rgb:109,123,255}
+.social-yt::before{opacity:.45}
+/* brand-tinted light: a static corner glow, plus the pointer-following spot (fine pointers) */
+.social-card::before{content:"";position:absolute;z-index:-1;right:-30%;top:-40%;width:90%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(var(--brand-rgb),.2),transparent 65%);transition:opacity .6s}
+.social-light{position:absolute;z-index:-1;left:0;top:0;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;background:radial-gradient(circle,rgba(var(--brand-rgb),.16),transparent 62%);opacity:0;transition:opacity .5s var(--ease-out);pointer-events:none}
+/* the brand glyph again, as a huge quiet watermark (monochrome: the YouTube play is cut out) */
+.social-mark{position:absolute;z-index:-1;right:-8%;bottom:-16%;width:62%;height:auto;--yt-a:currentColor;--yt-b:transparent;fill:currentColor;color:rgba(var(--brand-rgb),.08);transform:rotate(-14deg);transition:translate 1s var(--ease-out),color .8s}
+.social-top{display:flex;align-items:center;gap:0;margin-bottom:auto}
+/* full-colour brand tiles, like app icons */
+.social-glyph{display:grid;place-items:center;width:72px;height:72px;border-radius:22px;background:var(--tile);box-shadow:0 14px 34px -10px rgba(var(--brand-rgb),.7),inset 0 1px 0 rgba(255,255,255,.5),inset 0 -3px 0 rgba(0,0,0,.12);transition:translate .7s var(--ease-out),rotate .7s var(--ease-out)}
+.social-glyph svg{width:40px;height:40px;fill:#fff}
+.social-yt{--tile:#fff}
+.social-dc{--tile:linear-gradient(180deg,#6b77ff,#5865f2)}
+.social-dc .social-glyph svg{width:38px;height:38px}
+.social-avatar{width:56px;height:56px;margin-left:-12px;border-radius:50%;overflow:hidden;border:2px solid #0b1d45;box-shadow:0 0 0 1px rgba(166,233,255,.5),0 0 24px -4px rgba(95,211,255,.7);transition:translate .7s var(--ease-out)}
+.social-avatar img{width:100%;height:100%;object-fit:cover}
+.social-kind{margin-top:56px;font:600 10.5px/1 var(--f-body);letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+.social-handle{margin-top:14px;font:700 clamp(28px,3.1vw,46px)/1.05 var(--f-round);letter-spacing:0;color:#fff;overflow-wrap:anywhere}
+.social-desc{margin-top:12px;color:var(--muted);font-size:15.5px}
+.social-cta{display:inline-flex;align-items:center;gap:12px;min-height:52px;margin-top:28px;padding:0 7px 0 22px;border-radius:999px;border:1px solid rgba(var(--brand-rgb),.5);background:rgba(var(--brand-rgb),.08);font:600 16px/1 var(--f-round);letter-spacing:.01em;transition:background-color .5s var(--ease-out),color .5s var(--ease-out),border-color .5s}
+.social-arrow{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--brand);color:#fff;font:600 14px/1 var(--f-body);transition:transform .6s var(--ease-out)}
+@media (hover:hover){
+  .social-card:hover{border-color:rgba(var(--brand-rgb),.5);translate:0 -6px;box-shadow:0 50px 100px -50px rgba(0,0,0,.95),0 0 60px -30px rgba(var(--brand-rgb),.6)}
+  .social-card:hover .social-light{opacity:1}
+  .social-card:hover .social-glyph{translate:0 -4px;rotate:-6deg}
+  .social-card:hover .social-avatar{translate:6px 0}
+  .social-card:hover .social-cta{background:rgba(var(--brand-rgb),.2)}
+  .social-card:hover .social-mark{translate:-14px -10px;color:rgba(var(--brand-rgb),.11)}
+  .social-card:hover .social-arrow{transform:rotate(45deg)}
+}
+.social-yt .social-mark{color:rgba(255,255,255,.035)}
+@media (hover:hover){.social-yt:hover .social-mark{color:rgba(255,255,255,.05)}}
+.social-card:focus-visible{outline-offset:6px;border-radius:28px}
+
+/* 11. Contact + footer finale ---------------------------------------------- */
+.contact-section{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(30px,3vw,48px) clamp(48px,8vw,130px);align-items:end;padding-bottom:clamp(70px,8vw,120px)}
+.contact-head{grid-column:1/-1}
+.contact-card{grid-column:2;justify-self:start}
+.contact-head h2{font-size:clamp(38px,7.4vw,124px);font-weight:800;line-height:.95;letter-spacing:-.045em}
+.contact-head h2 em{font-size:1.2em}
+.contact-card{position:relative;padding-bottom:14px}
+.contact-card>p{color:var(--muted);line-height:1.7;font-size:16px;max-width:360px}
+.contact-email{position:relative;display:inline-flex;align-items:baseline;gap:14px;max-width:100%;min-height:44px;margin:18px 0 0;padding:8px 0 14px;font:600 min(clamp(17px,2vw,30px),4.9vw)/1.2 var(--f-display);letter-spacing:-.03em;white-space:nowrap;transition:color .4s var(--ease-out)}
+.contact-email-arrow{flex:none;color:var(--gold);transition:transform .6s var(--ease-out)}
+.contact-email-line{position:absolute;left:0;right:0;bottom:0;height:1px;background:rgba(95,211,255,.4);overflow:hidden}
+.contact-email-line::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,var(--cyan),var(--gold-hi));transform:scaleX(0);transform-origin:right;transition:transform .8s var(--ease-out)}
+@media (hover:hover){
+  .contact-email:hover{color:var(--cyan-hi)}
+  .contact-email:hover .contact-email-arrow{transform:translate(4px,-4px)}
+  .contact-email:hover .contact-email-line::after{transform:scaleX(1);transform-origin:left}
+}
+
+.site-footer{position:relative;width:100%;max-width:calc(var(--max) + var(--gutter) * 2);margin:0 auto;padding:0 var(--gutter)}
+.footer-top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px 0;border-top:1px solid var(--line)}
+.footer-brand{display:flex;align-items:center;gap:12px;min-height:44px}
+.footer-brand img{width:36px;height:35px;object-fit:contain}
+.footer-brand span{display:flex;align-items:baseline;gap:6px;font:700 18px/1 var(--f-round);letter-spacing:.035em;color:var(--ice);text-shadow:0 2px 0 var(--drop);transition:color .4s}
+.footer-brand small{font:600 10px/1 var(--f-round);letter-spacing:.16em;color:var(--muted);text-shadow:none}
+.footer-links{display:flex;flex-wrap:wrap;gap:0 28px;list-style:none;margin:0;padding:0}
+.footer-links a,.footer-top-link{display:inline-flex;align-items:center;gap:8px;min-height:44px;font:600 11px/1 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--text-2);transition:color .4s}
+@media (hover:hover){.footer-links a:hover,.footer-top-link:hover{color:var(--cyan-hi)}.footer-brand:hover span{color:#fff}}
+
+/* finale: a planet's limb glows on the horizon (--hz from the top), the wordmark rises above it */
+.finale{--hz:66%;position:relative;left:50%;width:100vw;margin-left:-50vw;height:clamp(240px,32vw,540px);overflow:hidden;pointer-events:none;user-select:none}
+.finale-planet{--d:max(2400px,190vw);position:absolute;left:50%;top:var(--hz);width:var(--d);aspect-ratio:1;margin-left:calc(var(--d) / -2);border-radius:50%;background:radial-gradient(circle at 50% 0%,#0b1d45 0%,#050d22 9%,#040a1b 30%);box-shadow:0 -2px 0 0 rgba(166,233,255,.75),0 -10px 40px 0 rgba(95,211,255,.45),0 -60px 140px 20px rgba(26,127,230,.3),inset 0 14px 40px -10px rgba(95,211,255,.35)}
+.finale-rim{position:absolute;left:50%;top:var(--hz);width:min(1100px,90vw);height:220px;margin:-110px 0 0 calc(min(1100px,90vw) / -2);background:radial-gradient(ellipse at center,rgba(166,233,255,.32),rgba(95,211,255,.08) 38%,transparent 66%);opacity:.9}
+/* the wordmark in the banner's rounded face, rising out of the planet's light */
+.footer-word{position:absolute;left:0;right:0;top:0;height:var(--hz);display:flex;justify-content:center;align-items:flex-end;overflow:hidden;font:700 clamp(58px,15.4vw,280px)/.8 var(--f-round);letter-spacing:0;padding-bottom:.02em}
+.footer-word span{display:block;padding:0 .01em;background:linear-gradient(180deg,#e6faff 0%,var(--ice) 30%,#38c8f0 55%,var(--blue) 80%,rgba(15,79,196,.2) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent}
+.footer-bottom{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0 30px;border-top:1px solid var(--line);background:#040a1b;box-shadow:0 0 0 100vmax #040a1b;clip-path:inset(0 -100vmax);font:400 12.5px/1.5 var(--f-body);letter-spacing:.04em;color:var(--dim)}
+.footer-actions{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+/* pause-motion toggle: a quiet footer control, lit when motion is paused */
+.motion-toggle{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0;border:0;background:none;cursor:pointer;font:600 11px/1 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--text-2);transition:color .4s}
+.motion-toggle[hidden]{display:none}
+.motion-toggle-icon{position:relative;width:9px;height:10px;flex:none;border-left:2px solid currentColor;border-right:2px solid currentColor;transition:border-width .3s var(--ease-out)}
+html.paused .motion-toggle{color:var(--gold-hi)}
+.motion-toggle .mt-on,html.paused .motion-toggle .mt-off{display:none}
+html.paused .motion-toggle .mt-on{display:inline-block}
+html.paused .motion-toggle .motion-toggle-icon{border-right-width:0;border-left-width:9px;border-top:5px solid transparent;border-bottom:5px solid transparent;border-left-color:currentColor;height:0}
+@media (hover:hover){.motion-toggle:hover{color:var(--cyan-hi)}}
+html.paused *,html.paused *::before,html.paused *::after{animation-play-state:paused!important}
+/* …except the intro curtain, which must always finish lifting */
+html.paused .intro,html.paused .intro *{animation-play-state:running!important}
+
+/* 11b. Comet (desktop, created by script.js) ---------------------------------
+   The hero's star breaks away and falls down the page into the portal. The trail
+   canvas and the star sit UNDER the page content, so they never cover copy. */
+.comet-canvas{position:fixed;left:0;top:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.comet-star{position:fixed;left:0;top:0;z-index:0;pointer-events:none;visibility:hidden;transform-origin:30.3% 30.2%;will-change:transform,opacity}
+/* while it is still beside the hero's tail it flies above it, like the logo's star */
+.comet-star.is-over{z-index:2}
+.comet-star img{position:relative;display:block;width:100%;height:auto;max-width:none;filter:drop-shadow(0 0 22px rgba(249,198,27,.55))}
+.cs-glow{position:absolute;left:30.3%;top:30.2%;width:80%;aspect-ratio:1;margin:-40% 0 0 -40%;border-radius:50%;background:radial-gradient(circle,rgba(255,236,170,.42) 0%,rgba(249,198,27,.14) 22%,rgba(56,200,240,.08) 42%,transparent 62%)}
+html.comet-on [data-mark-star]{visibility:hidden}
+/* (--cut: 0→1 as the star moves off, written by script.js, so the hole opens behind it rather than popping) */
+html.comet-on [data-mark-tail]{--r:calc(28% * var(--cut,1));-webkit-mask-image:radial-gradient(circle at 30.3% 30.2%,transparent 0 var(--r),#000 calc(var(--r) + 10%));mask-image:radial-gradient(circle at 30.3% 30.2%,transparent 0 var(--r),#000 calc(var(--r) + 10%))}
+html.menu-open .comet-star{visibility:hidden!important}
+
+/* 12. Cursor (fine pointers only, created by JS) --------------------------- */
+.cursor{position:fixed;left:0;top:0;z-index:250;pointer-events:none;opacity:0;transition:opacity .3s}
+html.cursor-on .cursor{opacity:1}
+html.cursor-on .cursor.is-away{opacity:0}
+/* GSAP moves the wrappers; CSS only ever scales the inner <i> (never transition a GSAP-driven transform) */
+.cursor-dot,.cursor-ring{position:fixed;left:0;top:0}
+.cursor-dot i{display:block;width:10px;height:10px;margin:-5px 0 0 -5px;background:var(--gold-hi);clip-path:var(--sparkle);transition:transform .35s var(--ease-out)}
+.cursor-ring i{display:block;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:1px solid rgba(166,233,255,.45);transition:transform .55s var(--ease-out),background-color .4s,border-color .4s}
+/* contextual tag: a small chip trailing beside the ring, never covering what you point at */
+.cursor-label{position:absolute;left:38px;top:34px;padding:8px 13px 8px 11px;border-radius:999px;background:var(--cyan);color:#07132e;font:600 10px/1 var(--f-body);letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;opacity:0;transform:scale(.6) translateY(6px);transform-origin:0 0;transition:opacity .3s,transform .5s var(--ease-out);box-shadow:0 10px 30px -10px rgba(95,211,255,.7)}
+.cursor-label::before{content:"↗ "}
+/* near the right / bottom edges the chip trails on the other side, so it is never cut off */
+.cursor.flip-x .cursor-label{left:auto;right:38px;transform-origin:100% 0}
+.cursor.flip-y .cursor-label{top:auto;bottom:34px}
+.cursor.flip-y:not(.flip-x) .cursor-label{transform-origin:0 100%}
+.cursor.flip-x.flip-y .cursor-label{transform-origin:100% 100%}
+.cursor.is-link .cursor-ring i,.cursor.is-label .cursor-ring i{transform:scale(1.55);border-color:rgba(95,211,255,.8);background-color:rgba(95,211,255,.08)}
+.cursor.is-link .cursor-dot i,.cursor.is-label .cursor-dot i{transform:scale(.6) rotate(45deg)}
+.cursor.is-label .cursor-label{opacity:1;transform:none}
+.cursor.is-down .cursor-ring i{transform:scale(.8)}
+html.cursor-on,html.cursor-on *{cursor:none!important}
+/* High Contrast users keep their own system cursor */
+@media (forced-colors:active){.cursor{display:none}html.cursor-on,html.cursor-on *{cursor:auto!important}}
+
+/* 13. Intro curtain (first visit, pure CSS so its clock starts at first paint) ----
+   0.05–0.8s a comet streaks in from the lower right and brakes into place as the
+   star; its tail blooms out behind it with a flash; STARFALL resolves letter by
+   letter; at 1.08s the curtain dissolves (0.67s) into the same sky — the hero
+   starts on that lift (script.js reads the running animation). */
+.intro{display:none}
+html.show-intro:not(.no-anim) .intro{position:fixed;inset:0;z-index:300;display:block;animation:introOut .67s var(--ease-io) 1.08s forwards}
+/* the curtain's own layers fade; the element itself only switches off at the end (its mark may fly on) */
+.intro::before{content:"";position:absolute;inset:0;background:radial-gradient(90% 70% at 50% 42%,#0b1d45 0%,#06112b 55%,#050d22 100%);animation:introFadeOut .6s var(--ease-io) 1.08s forwards}
+.intro-sky{position:absolute;inset:0;opacity:.9;animation:introFadeOut .6s var(--ease-io) 1.08s forwards;background:var(--stars)}
+.intro-stage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(18px,3vh,30px)}
+.intro-stage>*{animation:introStage .6s var(--ease-io) 1.08s forwards}
+.intro-mark{position:relative;width:clamp(170px,22vw,290px);aspect-ratio:760/735}
+.intro-trail,.intro-star{position:absolute;inset:0;width:100%;height:100%;max-width:none}
+.intro-trail{transform-origin:30.3% 30.2%;opacity:0;transform:scale(.12) rotate(-14deg);filter:drop-shadow(0 0 14px rgba(56,200,240,.5));animation:introTrail .62s cubic-bezier(.2,.8,.25,1) .5s forwards}
+.intro-flyer{position:absolute;inset:0;transform:translate(60vmax,50vmax) scale(.5);animation:introComet .78s cubic-bezier(.12,.72,.18,1) .04s forwards}
+.intro-star{filter:drop-shadow(0 0 18px rgba(249,198,27,.75))}
+/* the streak: a long light trail fixed to the star's centre, collapsing as the comet brakes */
+.intro-streak{position:absolute;left:30.3%;top:30.2%;width:85vmax;height:clamp(84px,16vmin,150px);margin-top:clamp(-75px,-8vmin,-42px);transform-origin:0 50%;transform:rotate(40deg);background:linear-gradient(90deg,#fff 0,rgba(200,242,255,.95) 4%,rgba(95,211,255,.8) 16%,rgba(26,127,230,.42) 45%,rgba(15,79,196,0) 100%);clip-path:polygon(0 50%,2% 16%,100% 44%,100% 56%,2% 84%);-webkit-mask:linear-gradient(180deg,transparent 0,rgba(0,0,0,.55) 22%,#000 40%,#000 60%,rgba(0,0,0,.55) 78%,transparent 100%);mask:linear-gradient(180deg,transparent 0,rgba(0,0,0,.55) 22%,#000 40%,#000 60%,rgba(0,0,0,.55) 78%,transparent 100%);animation:introStreak .8s cubic-bezier(.45,0,.7,1) .04s forwards}
+/* bright fibres inside the tail, fanning out like the logo's */
+.intro-streak::before,.intro-streak::after{content:"";position:absolute;left:2%;top:50%;width:90%;height:3px;margin-top:-1.5px;border-radius:3px;background:linear-gradient(90deg,#fff,rgba(255,255,255,.75) 25%,transparent 80%);transform-origin:0 50%}
+.intro-streak::before{transform:rotate(-2.2deg)}
+.intro-streak::after{width:70%;transform:rotate(2.6deg)}
+.intro-flash{position:absolute;left:30.3%;top:30.2%;width:120%;aspect-ratio:1;margin:-60% 0 0 -60%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.95) 0%,rgba(255,226,122,.55) 14%,rgba(95,211,255,.18) 38%,transparent 64%);opacity:0;transform:scale(.2);animation:introFlash .7s var(--ease-out) .66s forwards}
+/* the name in the banner's voice: chunky rounded cyan with its dark drop */
+.intro-word{display:flex;gap:.12em;margin:0;padding-left:.12em;font:700 clamp(34px,4.4vw,60px)/1.1 var(--f-round);letter-spacing:.02em;color:var(--ice);text-shadow:0 .06em 0 var(--drop),0 0 22px rgba(56,200,240,.55)}
+.intro-word span{display:block;opacity:0;filter:blur(10px);transform:translateY(.35em) scale(1.35);animation:introResolve .55s var(--ease-out) forwards}
+.intro-word span:nth-child(1){animation-delay:.62s}.intro-word span:nth-child(2){animation-delay:.665s}.intro-word span:nth-child(3){animation-delay:.71s}.intro-word span:nth-child(4){animation-delay:.755s}.intro-word span:nth-child(5){animation-delay:.8s}.intro-word span:nth-child(6){animation-delay:.845s}.intro-word span:nth-child(7){animation-delay:.89s}.intro-word span:nth-child(8){animation-delay:.935s}
+.intro-meta{margin:0;font:600 11px/1 var(--f-body);letter-spacing:.34em;text-transform:uppercase;color:var(--gold-hi);opacity:0;animation:introFade .32s ease .66s forwards,introWordOut .26s cubic-bezier(.4,0,.2,1) .98s forwards} /* gone before the hero's own studio line fades in */
+/* the name leaves before the hero's title rises underneath it (no ghosting) */
+.intro-stage>.intro-word{animation:introWordOut .36s cubic-bezier(.5,0,.9,.6) .96s forwards} /* gone by 1.32s; on phones, where the hero title rises in the same place, the title waits until ≈1.4s (script.js) */
+/* a ring of light bursts from the landed star as the curtain opens onto the page */
+.intro-ring{--rs:min(200px,30vmin);position:absolute;left:30.3%;top:30.2%;width:var(--rs);height:var(--rs);margin:calc(var(--rs) / -2) 0 0 calc(var(--rs) / -2);border-radius:50%;pointer-events:none;opacity:0;transform:scale(.2);box-shadow:0 0 0 2px rgba(235,252,255,.9),0 0 26px 5px rgba(95,211,255,.6),inset 0 0 26px 5px rgba(95,211,255,.45);animation:introRing .95s cubic-bezier(.2,.7,.25,1) .98s forwards}
+@keyframes introComet{to{transform:none}}
+@keyframes introStreak{50%{opacity:1;transform:rotate(40deg) scaleX(.82)}to{transform:rotate(40deg) scaleX(0);opacity:0}} /* the tail holds while the star flies, then reels in as it brakes */
+@keyframes introTrail{to{opacity:1;transform:none}}
+@keyframes introFlash{30%{opacity:1}to{opacity:0;transform:scale(1.6)}}
+@keyframes introResolve{to{opacity:1;filter:blur(0);transform:none}}
+@keyframes introFade{to{opacity:1}}
+@keyframes introStage{to{opacity:0;transform:scale(1.08)}}
+@keyframes introWordOut{to{opacity:0;transform:translateY(-12px) scale(.97)}}
+@keyframes introRing{14%{opacity:1}to{opacity:0;transform:scale(12)}}
+@keyframes introFadeOut{to{opacity:0}}
+@keyframes introOut{0%,99%{visibility:visible}100%{visibility:hidden}}
+
+/* 14. Motion states — only ever hidden when JS + motion are on, and never after .no-anim.
+   Everything hides with opacity only, so links inside stay keyboard-focusable. */
+html.motion:not(.no-anim) [data-hero],
+html.motion:not(.no-anim) [data-reveal],
+html.motion:not(.no-anim) [data-split],
+html.motion:not(.no-anim) [data-lines],
+html.motion:not(.no-anim) [data-constellation],
+html.motion:not(.no-anim) .site-header>.brand,
+html.motion:not(.no-anim) .site-header>.menu-toggle,
+html.motion:not(.no-anim) .site-header>.nav{opacity:0}
+html.motion:not(.no-anim) [data-line]{transform:scaleX(0)}
+html.motion:not(.no-anim) [data-facts] li::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,var(--cyan),rgba(95,211,255,0));transform:scaleX(0);transform-origin:left;transition:transform 1.2s var(--ease-out) calc(var(--i) * .12s)}
+html.motion:not(.no-anim) [data-facts].is-in li::after{transform:scaleX(1)}
+html.motion:not(.no-anim) [data-facts] li>*{opacity:0;transform:translateY(14px);transition:opacity .9s var(--ease-out) calc(.1s + var(--i) * .1s),transform .9s var(--ease-out) calc(.1s + var(--i) * .1s)}
+html.motion:not(.no-anim) [data-facts].is-in li>*{opacity:1;transform:none}
+html.motion:not(.no-anim) [data-facts] li>:focus-visible{opacity:1;transform:none;transition-delay:0s} /* a row reached by keyboard is never invisible */
+@media (hover:hover){ /* hover transforms still win once revealed */
+  html.motion:not(.no-anim) [data-facts].is-in li:hover .f-num{transform:translateX(6px);transition-delay:0s}
+  html.motion:not(.no-anim) [data-facts].is-in li:hover strong{transform:translateX(10px);transition-delay:0s}
+  html.motion:not(.no-anim) [data-facts].is-in li:hover .f-go{transform:translate(3px,-3px);transition-delay:0s}
+}
+/* the JS-driven marquee replaces the CSS loop */
+html.marquee-js .rift-track{animation:none}
+/* off-screen sections pause every CSS loop (toggled per section by script.js; never after a fallback) */
+html.motion:not(.no-anim) .is-idle,html.motion:not(.no-anim) .is-idle *,html.motion:not(.no-anim) .is-idle *::before,html.motion:not(.no-anim) .is-idle *::after{animation-play-state:paused!important}
+
+/* compositor layers for what the hero scrubs while you scroll (desktop) and the pointer lean (mouse):
+   moving them never repaints the filtered logo art */
+@media (min-width:851px){
+  html.motion:not(.no-anim) :is(.hero-eyebrow,.hero-title,.hero-copy,.hero-actions,[data-mark-depth]){will-change:transform}
+  html.motion:not(.no-anim) .hero-inner{will-change:opacity}
+}
+@media (min-width:1024px) and (min-height:640px){html.motion:not(.no-anim) [data-mark-tail]{will-change:opacity}}
+@media (hover:hover) and (pointer:fine){html.motion:not(.no-anim) :is([data-mark-art],[data-mark-star]){will-change:transform}}
+
+/* 15. Responsive ----------------------------------------------------------- */
+@media (max-width:1180px){
+  .nav-num{display:none}
+  .nav-link{padding-left:10px;padding-right:10px}
+  .nav-link::after{left:10px;right:10px}
+}
+/* 851–1180: the heading's constellation keeps to the strip above the intro text */
+@media (max-width:1180px) and (min-width:851px){.c-games{top:0;height:96px}}
+@media (max-width:1100px){
+  .game-card{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .game-card.is-cinematic .worlds{left:25%;right:25%}
+}
+@media (max-width:980px) and (min-width:851px){
+  .brand-word small{display:none}
+  .nav{gap:12px}
+  .nav-cta{padding-left:16px}
+}
+@media (max-width:920px) and (min-width:851px){
+  .nav{gap:8px}
+  .nav-link{padding-left:7px;padding-right:7px}
+  .nav-link::after{left:7px;right:7px}
+  .nav-cta{padding-left:14px;font-size:14px}
+}
+/* 851–1100: the two hero CTAs share one row (and fill it evenly when the column is too narrow) */
+@media (max-width:1100px) and (min-width:851px){
+  .hero-actions{gap:10px}
+  .hero-actions .button{flex:1 1 auto;padding:0 24px 0 26px;gap:12px}
+}
+@media (max-width:850px){
+  :root{--header-h:68px}
+  /* mobile menu: the same <nav> becomes a full-screen night sheet that irises open from the toggle */
+  .menu-toggle{position:relative;z-index:2;display:inline-flex;align-items:center;gap:12px;min-height:48px;padding:0 6px 0 16px;border-radius:999px;border:1px solid var(--line-2);background:rgba(5,13,34,.6);cursor:pointer;-webkit-tap-highlight-color:transparent;font:600 9.5px/1 var(--f-display);letter-spacing:.16em;text-transform:uppercase}
+  .menu-toggle-text{display:block;height:1.3em;overflow:hidden}
+  .menu-toggle-text span{display:block;line-height:1.3;transition:transform .7s var(--ease-out)}
+  .menu-open .menu-toggle-text span{transform:translateY(-100%)}
+  .menu-toggle-lines{position:relative;display:block;width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#ffe58a,var(--gold) 50%,#f6a316)}
+  .menu-toggle-lines span{position:absolute;left:10px;width:14px;height:1.5px;border-radius:2px;background:#07132e;transition:transform .6s var(--ease-out),top .6s var(--ease-out)}
+  .menu-toggle-lines span:first-child{top:13.5px}
+  .menu-toggle-lines span:last-child{top:19px}
+  .menu-open .menu-toggle{border-color:rgba(249,198,27,.5)}
+  .menu-open .menu-toggle-lines span:first-child{top:16.25px;transform:rotate(45deg)}
+  .menu-open .menu-toggle-lines span:last-child{top:16.25px;transform:rotate(-45deg)}
+
+  /* flex-start + the auto margins on kicker/foot: centred when it fits, scrollable from the top when it doesn't */
+  .nav{position:fixed;inset:0;z-index:1;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;overscroll-behavior:contain;padding:calc(var(--header-h) + 24px) var(--gutter) 30px;
+    background:radial-gradient(circle at 100% 0%,rgba(26,127,230,.3),transparent 55%),radial-gradient(circle at 0% 100%,rgba(56,200,240,.14),transparent 50%),
+      var(--stars),
+      linear-gradient(180deg,#06112b,#050d22);
+    clip-path:circle(0px at calc(100% - var(--gutter) - 24px) calc(var(--header-h) / 2));visibility:hidden;transition:clip-path .7s cubic-bezier(.33,1,.68,1),visibility 0s linear .7s;overflow-y:auto}
+  .menu-open .nav{clip-path:circle(160% at calc(100% - var(--gutter) - 24px) calc(var(--header-h) / 2));visibility:visible;transition:clip-path .8s cubic-bezier(.6,0,.2,1),visibility 0s}
+  .nav-kicker,.nav-foot{opacity:0;transition:opacity .35s var(--ease-out)}
+  .menu-open :is(.nav-kicker,.nav-foot){opacity:1;transition:opacity .8s var(--ease-out) .3s}
+  .nav-kicker{display:block;margin:auto 0 16px;font:600 11px/1 var(--f-body);letter-spacing:.3em;text-transform:uppercase;color:var(--gold-hi)}
+  .nav-list{flex-direction:column;align-items:stretch;gap:0;border-top:1px solid var(--line)}
+  .nav-list li{opacity:0;transform:translateY(46px);transition:opacity .35s var(--ease-out),transform .5s var(--ease-out)}
+  .menu-open .nav-list li{opacity:1;transform:none;transition:opacity .9s var(--ease-out) calc(.2s + var(--i) * .07s),transform .9s var(--ease-out) calc(.2s + var(--i) * .07s)}
+  .nav-link{align-items:center;gap:16px;padding:18px 0;font:700 clamp(30px,9vw,52px)/1 var(--f-display);letter-spacing:-.035em;text-transform:uppercase;color:var(--text);border-bottom:1px solid var(--line)}
+  .nav-link::after{display:none}
+  .nav-num{display:block;font-size:18px;width:26px;opacity:1;transform:translateY(-.55em)}
+  .nav-cta{justify-content:space-between;min-height:62px;margin-top:30px;padding:0 8px 0 26px;font-size:18px;opacity:0;transform:translateY(30px);transition:opacity .35s var(--ease-out),transform .5s var(--ease-out),color .45s,border-color .45s}
+  .nav-cta-icon{width:44px;height:44px;background:#07132e;color:var(--gold-hi)}
+  .nav-cta{color:#07132e;border-color:var(--gold);box-shadow:0 18px 44px -18px rgba(249,170,27,.6)}
+  .nav-cta-fill{transform:none} /* in the sheet the CTA is the gold star itself */
+  .nav-cta::after{opacity:1}
+  .menu-open .nav-cta{opacity:1;transform:none;transition:opacity .9s var(--ease-out) .45s,transform .9s var(--ease-out) .45s}
+  .nav-foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:24px;font:600 10px/1 var(--f-body);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+  .nav-foot-links{display:flex;gap:10px}
+  .nav-foot-links a{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;border:1px solid var(--line-2);color:var(--text-2)}
+  .nav-foot-links svg{width:20px;height:20px;fill:currentColor;--yt-a:currentColor;--yt-b:transparent}
+  html.menu-open,html.menu-open body{overflow:hidden}
+  /* a scrolled (landscape) sheet slides under a solid header bar, never under the logo or Close */
+  .menu-open .header-glass{opacity:1;z-index:2;background:linear-gradient(180deg,#050d22,#061028)}
+  .nav{scroll-padding-top:calc(var(--header-h) + 8px)}
+
+  .hero{padding-top:calc(var(--header-h) + 10px);min-height:max(100svh,640px)}
+  /* tablet + phone: the mark rises above the title, the copy reads underneath */
+  .hero-inner{grid-template-columns:minmax(0,1fr);grid-template-areas:"mark" "eyebrow" "title" "copy" "actions";align-content:center;padding:6px 0 40px}
+  .hero-mark{justify-self:center;width:min(64vw,400px);margin:0 0 6px}
+  .hero-title{font-size:clamp(40px,9.6vw,76px);margin:22px 0 0}
+  .hero-copy{font-size:16px;max-width:560px;margin-top:24px}
+  .hero-actions{margin-top:28px}
+  .hero-live{background:rgba(5,13,34,.85)}
+  .section-heading{display:block}
+  .section-intro{margin-top:26px;max-width:440px}
+  .c-games{top:auto;bottom:auto;right:var(--gutter);top:70px;width:46vw;height:120px;opacity:.8}
+  .game-card{grid-template-columns:minmax(0,1fr);border-radius:22px}
+  .game-art{min-height:440px;border-right:0;border-bottom:1px solid var(--line)}
+  .creator-section{grid-template-columns:1fr}
+  .creator-portrait{width:min(78vw,420px)}
+  .c-creator{display:none}
+  .creator-copy h2{font-size:clamp(36px,8.2vw,66px)}
+  .community-grid{grid-template-columns:1fr}
+  .c-link{display:none}
+  .social-card{min-height:0}
+  .social-kind{margin-top:40px}
+  .contact-section{grid-template-columns:minmax(0,1fr);gap:34px}
+  .contact-card{grid-column:1}
+  .footer-top{flex-wrap:wrap}
+}
+@media (max-width:560px){
+  :root{--gutter:20px}
+  /* phones: tighter vertical rhythm, no long empty bands between sections */
+  .section{padding-top:84px;padding-bottom:84px}
+  .games-section{padding-top:56px;padding-bottom:64px}
+  .creator-section{padding-top:56px}
+  .quote-section{padding-top:10px;padding-bottom:30px}
+  .quote-section blockquote{margin:36px 0 20px;font-size:min(8vw,40px)}
+  .quote-cite{letter-spacing:.18em;margin-bottom:36px}
+  .quote-cite::before,.quote-cite::after{display:none}
+  .contact-section{padding-bottom:64px}
+  .brand{gap:10px}
+  .brand-mark{width:40px;height:38px}
+  .brand-word{font-size:13px;letter-spacing:.1em}
+  .hero-mark{width:min(70vw,300px)}
+  .hero-eyebrow{font-size:10px;letter-spacing:.2em;gap:10px}
+  .hero-title{font-size:clamp(34px,10.4vw,48px);margin-top:20px}
+  .hero-copy{font-size:15.5px;margin-top:20px}
+  .hero-actions{display:grid;grid-template-columns:1fr;margin-top:26px}
+  .hero-actions .button{width:100%;justify-content:space-between}
+  .hero-actions .button-ghost{justify-content:center}
+  .hero-foot{padding:16px 0 20px}
+  .hero-live{padding:0 14px;font-size:10px;letter-spacing:.1em}
+  .hero-live-sep,.hero-live-muted{display:none}
+  .scroll-note{font-size:9px;gap:12px}
+  .scroll-line{width:32px}
+  h2{font-size:clamp(32px,9.4vw,44px)}
+  .c-games{display:none}
+  .game-art{min-height:380px}
+  .tunnel{transform:scale(.7)}
+  .w3,.w5{display:none}
+  .w1{width:62px;height:62px;left:17%;top:26%}
+  .w2{width:46px;height:46px;right:16%;top:22%}
+  .w4{width:52px;height:52px;right:9%;bottom:30%}
+  .game-art-label strong{font-size:min(46px,11.6vw)}
+  .game-art-label .lm>span{font-size:14px}
+  .game-stat strong{font-size:48px}
+  .game-art-label{left:22px;bottom:20px}
+  .game-badge{top:20px;left:20px}
+  .game-info{padding:32px 22px 24px}
+  .game-meta{grid-template-columns:1fr}
+  .game-meta>div{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-left:0;border-top:1px solid var(--line)}
+  .game-meta>div:first-child{border-top:0}
+  .game-meta dt{margin:0}
+  .game-info .button{padding:0 22px}
+  .creator-copy h2{font-size:clamp(32px,9.4vw,44px)}
+  .facts a{grid-template-columns:40px minmax(0,1fr) 20px;grid-template-rows:auto auto;padding:16px 0;row-gap:6px}
+  .facts small{grid-column:2;grid-row:2;font-size:13.5px}
+  .f-go{grid-column:3;grid-row:1/3}
+  .social-card{padding:26px 22px;border-radius:22px}
+  .social-glyph{width:60px;height:60px;border-radius:18px}
+  .social-glyph svg{width:30px;height:30px}
+  .social-avatar{width:48px;height:48px}
+  .social-handle{font-size:clamp(20px,6.4vw,26px)}
+  .contact-head h2{font-size:clamp(30px,9vw,44px)}
+  .footer-top{padding:18px 0;gap:6px 20px}
+  .footer-links{column-gap:18px}
+  .footer-bottom{flex-direction:column;align-items:flex-start;gap:4px}
+}
+@media (max-width:850px) and (max-height:700px){.hero-mark{width:min(50vw,240px)}}
+/* short desktop screens (e.g. 1536×730, 1280×720): the hero is sized by height too, so the CTAs and the hero foot share the first screen */
+@media (min-width:851px) and (max-height:820px){
+  .hero{min-height:max(100svh,560px)}
+  .hero-title{font-size:clamp(42px,min(6.7vw,10.5vh),112px);margin:20px 0 22px}
+  .hero-mark{width:clamp(280px,min(40vw,64vh),600px)}
+  .hero-actions{margin-top:28px}
+  .hero-inner{padding:8px 0 24px}
+  .hero-foot{padding:16px 0 20px}
+}
+/* landscape phones (and short landscape windows up to 1100px): a compact two-column hero, so the headline and the Play button share the first screen */
+@media (max-width:1100px) and (max-height:520px) and (orientation:landscape){
+  .hero{min-height:0}
+  .hero-inner{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"eyebrow mark" "title mark" "copy mark" "actions mark";align-content:start;column-gap:clamp(20px,4vw,40px);padding:2px 0 30px}
+  .hero-mark{width:min(34vw,62vh);margin:0;justify-self:end}
+  .hero-title{font-size:clamp(28px,9.5vh,44px);margin:12px 0 0}
+  .hero-copy{font-size:14.5px;line-height:1.6;margin-top:12px}
+  .hero-actions{margin-top:16px}
+  .hero-actions .button{min-height:50px}
+}
+/* landscape phones: a tighter menu sheet so everything fits (and the rest scrolls) */
+@media (max-width:850px) and (max-height:520px){
+  .nav{padding-top:calc(var(--header-h) + 8px)}
+  .nav-kicker{display:none}
+  .nav-link{font-size:clamp(24px,8vh,34px);padding:10px 0}
+  .nav-cta{margin-top:16px}
+  .nav-foot{padding-top:16px}
+}
+/* 360–400px phones: keep the hero's bottom row on one line */
+@media (max-width:400px){
+  h2,.creator-copy h2{font-size:min(36px,8.9vw)}
+  .contact-head h2{font-size:8.3vw}
+  .contact-email{font-size:4.5vw;gap:10px}
+  .scroll-line{display:none}
+  .scroll-note{letter-spacing:.18em}
+  .scroll-note,.hero-live{white-space:nowrap}
+  .footer-links{column-gap:14px}
+  .footer-links a{letter-spacing:.14em}
+  .game-stat strong{font-size:42px}
+  .game-stat{gap:10px}
+}
+/* 320–380px (400% zoom of a 1280px window): the big button and the hero's bottom row still fit */
+@media (max-width:380px){
+  .game-info .button{letter-spacing:.01em;padding:0 16px;gap:10px;font-size:17px}
+  .game-info .button .button-icon{margin-right:-8px}
+}
+@media (max-width:350px){
+  .scroll-note{display:none}
+  .hero-foot{justify-content:center}
+}
+/* touch: a designed press state instead of the browser's grey tap box */
+a,button{-webkit-tap-highlight-color:transparent}
+@media (hover:none){
+  .button,.nav-cta,.hero-live,.contact-email,.motion-toggle,.social-card{transition:transform .2s var(--ease-out),color .3s,border-color .3s,background-color .3s}
+  html.press-js :is(.button,.social-card){transition-property:color,border-color,background-color,box-shadow} /* GSAP springs the press */
+  .hero-live:active,html:not(.press-js) :is(.button,.nav-cta,.social-card):active{transform:scale(.97)}
+  .button:active .button-fill{transform:translate(-50%,-50%) scale(1);transition-duration:.3s}
+  .button-ghost:active{color:#07132e}
+  .hero-live:active{border-color:rgba(95,211,255,.5);background:rgba(95,211,255,.08)}
+  .social-card:active{border-color:rgba(var(--brand-rgb),.5)}
+  .contact-email:active,.motion-toggle:active,.footer-top-link:active,.footer-links a:active{color:var(--cyan-hi)}
+}
+
+/* 16. No-JS + reduced motion ----------------------------------------------- */
+/* without JS (or if script.js never booted: .no-anim without .ready) the mobile toggle
+   can't work, so the links simply sit in the header */
+@media (max-width:850px){
+  :is(html:not(.js),html.no-anim:not(.ready)) .menu-toggle{display:none}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav{position:static;clip-path:none;visibility:visible;transition:none;background:none;padding:0;flex-direction:row;overflow:visible}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav-list{flex-direction:row;border:0}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav-list li{opacity:1;transform:none}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav-link{min-height:44px;font:600 9.5px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;padding:17px 5px;border:0}
+  :is(html:not(.js),html.no-anim:not(.ready)) :is(.nav-num,.nav-cta,.nav-kicker,.nav-foot,.brand-word){display:none}
+  :is(html:not(.js),html.no-anim:not(.ready)) .brand{min-width:44px;justify-content:center}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
+  .roll-clone{display:none}
+  .roll .ch{transform:none!important}
+  .live-dot::after{display:none}
+  .rift-track{animation:none}
+  .tunnel i{animation:none!important;opacity:.4}
+  .tunnel i:nth-child(1){transform:scale(.4)}.tunnel i:nth-child(2){transform:scale(.95)}.tunnel i:nth-child(3){transform:scale(1.7)}
+  .intro{display:none!important}
+  /* the loops stop at their first frame: make sure that frame is the designed one */
+  .mark-shine,.game-sparks i,.mark-glint,.button-primary::after,.nav-cta::after{animation:none!important}
+  .mark-shine{display:none}
 }
