@@ -483,10 +483,12 @@
        the marquee drift); scroll-linked motion stays, since the visitor drives
        it. The choice is remembered on this device. */
     const pauseBtn = $('[data-motion-toggle]');
+    const pauseHooks = []; // JS-timed loops outside CSS and the sky (the Steal and Egg deck) hear about it here
     const setPaused = (p, save) => {
       paused = p;
       html.classList.toggle('paused', p); // CSS swaps the button's visible label, which is also its accessible name
       if (sky) sky.pause(p);
+      pauseHooks.forEach((fn) => { try { fn(p); } catch (e) { /* a loop that can't hear stays as it is */ } });
       if (save) { try { localStorage.setItem('sf-paused', p ? '1' : '0'); } catch (e) { /* storage blocked */ } }
     };
     if (pauseBtn && !REDUCE) {
@@ -495,6 +497,89 @@
       let saved = null;
       try { saved = localStorage.getItem('sf-paused'); } catch (e) { /* storage blocked */ }
       if (saved === '1') setPaused(true, false);
+    }
+
+    /* 6c. Update log tabs + the Steal and Egg deck (every JS tier) ---------------
+       Both work without the motion layer: the log switcher is an ARIA tablist
+       (click, arrow keys, Home / End) that shows one game's log at a time, and
+       the deck's buttons bring a scene to the front. The motion layer only adds
+       the choreography (logFx) and the deck's self-shuffle (deckKick). If the
+       wiring throws, both fall back to the static page (logs stacked). */
+    let logFx = null; // (panel) → animates a log that has just appeared (motion layer)
+    let deckKick = () => {}; // restarts the deck's self-shuffle timer (motion layer)
+    let deckStep = () => {}; // brings the next scene forward
+    const wireLog = () => {
+      const logEl = $('[data-log]');
+      const tabList = logEl && $('[role="tablist"]', logEl);
+      const tabs = tabList ? $$('[role="tab"]', tabList) : [];
+      const panels = tabs.map((t) => doc.getElementById(t.getAttribute('aria-controls')));
+      if (!tabs.length || !panels.every(Boolean)) return;
+      let current = Math.max(0, tabs.findIndex((t) => t.getAttribute('aria-selected') === 'true'));
+      // the selection glow takes the chosen tab's box (vertical list on desktop, a row on phones)
+      const placeGlow = () => {
+        const t = tabs[current];
+        tabList.style.setProperty('--gx', `${t.offsetLeft}px`);
+        tabList.style.setProperty('--gy', `${t.offsetTop}px`);
+        tabList.style.setProperty('--gw', `${t.offsetWidth}px`);
+        tabList.style.setProperty('--gh', `${t.offsetHeight}px`);
+      };
+      const show = (i, focus) => {
+        if (focus) tabs[i].focus();
+        if (i === current) return;
+        current = i;
+        tabs.forEach((t, k) => {
+          t.setAttribute('aria-selected', k === i ? 'true' : 'false');
+          t.tabIndex = k === i ? 0 : -1;
+          panels[k].hidden = k !== i;
+        });
+        placeGlow();
+        if (logFx) { try { logFx(panels[i]); } catch (e) { /* the log is shown either way */ } }
+      };
+      tabs.forEach((t, i) => {
+        t.tabIndex = i === current ? 0 : -1;
+        t.addEventListener('click', () => show(i, false));
+        t.addEventListener('keydown', (e) => {
+          const n = tabs.length;
+          const to = { ArrowRight: i + 1, ArrowDown: i + 1, ArrowLeft: i - 1 + n, ArrowUp: i - 1 + n, Home: 0, End: n - 1 }[e.key];
+          if (to === undefined) return;
+          e.preventDefault();
+          show(to % n, true);
+        });
+      });
+      panels.forEach((p, k) => { p.hidden = k !== current; });
+      html.classList.add('log-js');
+      placeGlow();
+      if ('ResizeObserver' in window) new ResizeObserver(placeGlow).observe(tabList);
+      else window.addEventListener('resize', placeGlow);
+    };
+    const wireDeck = () => {
+      const deck = $('[data-sae-deck]');
+      const shots = deck ? $$('.sae-shot', deck) : [];
+      const picks = deck ? $$('.sae-pick', deck) : [];
+      if (shots.length !== 3) return; // the CSS deck has exactly three places (.pos-0 front … .pos-2 back)
+      let front = 0;
+      const deal = (i) => {
+        front = ((i % 3) + 3) % 3;
+        shots.forEach((s, k) => {
+          const pos = (k - front + 3) % 3;
+          s.classList.remove('pos-0', 'pos-1', 'pos-2');
+          s.classList.add(`pos-${pos}`);
+          s.setAttribute('aria-hidden', pos === 0 ? 'false' : 'true'); // only the scene in front is read out
+        });
+        picks.forEach((p, k) => p.setAttribute('aria-pressed', k === front ? 'true' : 'false'));
+      };
+      deckStep = () => deal(front + 1);
+      picks.forEach((p, k) => p.addEventListener('click', () => { deal(k); deckKick(); }));
+      shots.forEach((s, k) => s.addEventListener('click', () => { if (k !== front) { deal(k); deckKick(); } }));
+      deal(0);
+      html.classList.add('deck-js');
+    };
+    try {
+      wireLog();
+      wireDeck();
+    } catch (err) {
+      html.classList.remove('log-js', 'deck-js');
+      $$('.log-panel').forEach((p) => { p.hidden = false; });
     }
 
     /* Static tiers stop here -------------------------------------------------- */
@@ -552,8 +637,14 @@
           '[data-portrait],.portrait-photo,.portrait-photo img,.portrait-ring,.portrait-orbit,.portrait-tag',
           '.social-card,.social-glyph,.social-avatar,.social-light,.button-primary,.nav-cta',
           '.footer-word span,.finale-planet,.finale-rim,.rift-track,.rift-lean,.rift-band,.site-header>*,.header-progress',
+          '.sae-tilt,.sae-shot-in,.sae-beam,.sae-picker,.log-tabs,.log-line,.log-node,.log-card',
         ].join(',')), { clearProps: 'all' });
       } catch (e) { /* keep rolling back */ }
+      // the log switcher and the deck keep working by hand; only their choreography stops
+      logFx = null;
+      deckKick = () => {};
+      const saeCard = $('.game-card-sae');
+      if (saeCard) saeCard.classList.remove('is-auto');
       if (anchorTween) { anchorTween.kill(); anchorTween = null; }
       if (velocityTick) gsap.ticker.remove(velocityTick);
       if (comet) { try { comet.destroy(); } catch (e) { /* ignore */ } comet = null; }
@@ -636,7 +727,8 @@
          leaves every measured position valid. Created after the pin, so
          positions include its spacer. */
       const restSteps = [
-        { el: $('#games'), fn: () => buildRevealsIn($('#games'), WIPE) },
+        { el: $('#games'), fn: () => { buildRevealsIn($('#games'), WIPE); buildSae(WIPE); } },
+        { el: $('#updates'), fn: () => { buildRevealsIn($('#updates'), WIPE); buildUpdates(WIPE); } },
         { el: $('#creator'), fn: () => { buildRevealsIn($('#creator'), WIPE); buildCreator(WIPE); } },
         { el: $('.quote-section'), fn: () => { buildRevealsIn($('.quote-section'), WIPE); buildQuote(); } },
         { el: $('#community'), fn: () => { buildRevealsIn($('#community'), WIPE); buildCommunity(); } },
@@ -1589,6 +1681,86 @@
       ScrollTrigger.create({ trigger: '.site-footer', start: 'top 65%', end: 'bottom top', onToggle: shower, onRefresh: shower });
     }
 
+    /* Steal and Egg ----------------------------------------------------------
+       The card deals itself in: it rises, the art wipes open from its outer
+       edge, the deck lands one card at a time (back cards first), the guard's
+       flashlight flickers on, the lockup and the info follow. Then the deck
+       shuffles itself every few seconds while the card is on screen, never
+       while a pointer or keyboard focus is on the art, the tab is hidden or
+       motion is paused; picking a scene restarts the clock. */
+    function buildSae(WIPE) {
+      const card = $('.game-card-sae');
+      if (!card) return;
+      const art = $('.sae-art', card);
+      const shotsIn = $$('.sae-shot-in', card);
+      const label = $$('.sae-label .lm > *', card);
+      const info = Array.from($('.game-info', card).children);
+      const beam = $('.sae-beam', card);
+      const picker = $('.sae-picker', card);
+      const badge = $('.game-badge', card);
+      if (beam) gsap.set(beam, { opacity: 0 });
+      const tl = gsap.timeline({ scrollTrigger: { trigger: card, start: 'top 80%', once: true } })
+        .from(card, { y: 70, opacity: 0, duration: 1.3, clearProps: 'transform' }, 0)
+        .fromTo(art, { clipPath: 'inset(0% 0% 0% 100% round 0px)' }, { clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 1.5, ease: WIPE, clearProps: 'clipPath' }, 0.05)
+        .from(shotsIn, { yPercent: 80, rotation: (i) => [-9, 7, -5][i] || 0, opacity: 0, duration: 1.15, stagger: { each: 0.13, from: 'end' }, ease: 'back.out(1.3)', clearProps: 'transform' }, 0.5)
+        .from(info, { opacity: 0, y: 28, duration: 1.05, stagger: 0.08, clearProps: 'transform' }, 0.3)
+        .from(label, { yPercent: 160, duration: 0.95, stagger: 0.08, ease: 'power3.out' }, 0.8);
+      if (beam) tl.to(beam, { keyframes: { opacity: [0, 0.9, 0.15, 1, 0.4, 1] }, duration: 0.9, ease: 'none', clearProps: 'opacity' }, 0.85);
+      if (badge) tl.from(badge, { opacity: 0, y: -12, duration: 0.9 }, 0.7);
+      if (picker) tl.from(picker, { opacity: 0, y: 16, duration: 0.9, clearProps: 'transform' }, 1.05);
+
+      const MS = 5200;
+      card.style.setProperty('--deck-ms', `${MS}ms`);
+      let onScreen = false, hovered = false, focused = false, timer = null;
+      const stop = () => { if (timer) { timer.kill(); timer = null; } card.classList.remove('is-auto'); };
+      const run = () => {
+        stop();
+        if (failed || !onScreen || hovered || focused || paused || doc.hidden) return;
+        void card.offsetWidth; // a fresh run restarts the picker's progress bar
+        card.classList.add('is-auto');
+        timer = gsap.delayedCall(MS / 1000, () => { timer = null; deckStep(); run(); });
+      };
+      deckKick = run;
+      pauseHooks.push(run);
+      ScrollTrigger.create({ trigger: card, start: 'top 75%', end: 'bottom 25%', onToggle: (s) => { onScreen = s.isActive; run(); } });
+      // a pointer and keyboard focus each hold the deck on their own: leaving with one never frees the other
+      art.addEventListener('pointerenter', () => { hovered = true; run(); });
+      art.addEventListener('pointerleave', () => { hovered = false; run(); });
+      art.addEventListener('focusin', () => { focused = true; run(); });
+      art.addEventListener('focusout', (e) => { focused = art.contains(e.relatedTarget); run(); });
+      doc.addEventListener('visibilitychange', run);
+    }
+
+    /* Update log ---------------------------------------------------------------
+       The switcher rises in, then the open log draws itself like a star chart:
+       the hairline runs down, each card slides in, each sparkle pops. Switching
+       games replays a quicker version on the log that appears. */
+    function buildUpdates(WIPE) {
+      const logEl = $('[data-log]');
+      if (!logEl) return;
+      const draw = (panel, first) => {
+        const line = $('.log-line', panel);
+        const tl = gsap.timeline();
+        if (line) tl.fromTo(line, { scaleY: 0 }, { scaleY: 1, duration: first ? 1.9 : 1.1, ease: WIPE }, 0);
+        return tl
+          .fromTo($$('.log-card', panel), { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: first ? 1.2 : 0.85, stagger: first ? 0.15 : 0.08, clearProps: 'transform' }, first ? 0.15 : 0)
+          .fromTo($$('.log-node', panel), { scale: 0, rotate: -120 }, { scale: 1, rotate: 0, duration: 0.9, stagger: first ? 0.15 : 0.08, ease: 'back.out(3)', clearProps: 'transform' }, first ? 0.3 : 0.1);
+      };
+      const tabsEl = $('.log-tabs', logEl);
+      if (tabsEl && html.classList.contains('log-js')) {
+        gsap.from(tabsEl, { opacity: 0, y: 26, duration: 1.1, clearProps: 'transform', scrollTrigger: { trigger: logEl, start: 'top 85%', once: true } });
+      }
+      const open = $$('.log-panel', logEl).filter((p) => !p.hidden);
+      let intro = gsap.timeline({ scrollTrigger: { trigger: logEl, start: 'top 78%', once: true } });
+      open.forEach((p) => intro.add(draw(p, true), 0));
+      let swap = null;
+      logFx = (panel) => {
+        if (intro) { if (intro.scrollTrigger) intro.scrollTrigger.kill(); intro.progress(1); intro = null; }
+        if (swap) swap.progress(1);
+        swap = draw(panel, false);
+      };
+    }
+
     /* Off-screen sections pause every CSS loop inside them */
     function buildIdle() {
       $$('.hero, .rift, .section, .quote-section, .site-footer').forEach((el) => {
@@ -1800,6 +1972,25 @@
       };
       const gameCard = $('.game-card');
       if (gameCard) depthField(gameCard, { depth: 34, light: true });
+
+      /* Steal and Egg: the same depth field, and the deck itself leans toward the pointer */
+      const saeCard = $('.game-card-sae');
+      if (saeCard) {
+        depthField(saeCard, { depth: 30, light: true });
+        const tilt = $('.sae-tilt', saeCard);
+        const saeArt = $('.sae-art', saeCard);
+        if (tilt && saeArt) {
+          const rx = gsap.quickTo(tilt, 'rotationX', { duration: 1, ease: 'power3' });
+          const ry = gsap.quickTo(tilt, 'rotationY', { duration: 1, ease: 'power3' });
+          let r = null, stamp = -1;
+          saeArt.addEventListener('pointermove', (e) => {
+            if (!r || stamp !== scrollStamp) { r = saeArt.getBoundingClientRect(); stamp = scrollStamp; }
+            ry(((e.clientX - r.left) / r.width - 0.5) * 16);
+            rx(-((e.clientY - r.top) / r.height - 0.5) * 12);
+          });
+          saeArt.addEventListener('pointerleave', () => { rx(0); ry(0); r = null; });
+        }
+      }
 
       /* Social cards: a brand-coloured light follows the pointer inside the card */
       $$('.social-card').forEach((card) => {

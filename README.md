@@ -1,6 +1,6 @@
 # Starfall Inc. Website
 
-A static, responsive one-page website for **Starfall Inc.**, the solo Roblox studio of BKProsYT, and its game **Pet Dimensions**.
+A static, responsive one-page website for **Starfall Inc.**, the solo Roblox studio of BKProsYT, and its games **Pet Dimensions** and **Steal and Egg**, with an update log for both.
 No build step: open `index.html` or upload the folder.
 
 ## Files
@@ -24,10 +24,13 @@ No build step: open `index.html` or upload the folder.
   - `starfall-star-head.webp`: the small star used for shooting stars, the portal core and the creator orbit
   - favicons and the share image
   - `bkprosyt-avatar.webp`: the creator avatar
-- `assets/fx/`: two pre-rendered light textures for the Pet Dimensions portal (the vortex swirl and a warp ring), so the running portal never re-blurs or re-masks anything per frame
+- `assets/fx/`: pre-rendered light textures: the vortex swirl and a warp ring for the Pet Dimensions portal, and the rainbow aura behind the Steal and Egg deck, so the running portal never re-blurs or re-masks anything per frame
+- `assets/games/`: the Steal and Egg thumbnails dealt in its card (`sae-steal`, `sae-race`, `sae-ride`, from the game's Roblox page) and the two game icons used by the update log tabs
 - `assets/vendor/`: GSAP, ScrollTrigger, SplitText, CustomEase and Lenis, bundled locally (see `assets/vendor/LICENSES.md`).
 
 ## Where to edit things
+- **Steal and Egg copy**: in `index.html`, between the `========== STEAL AND EGG COPY ==========` comments (blurb, the "10 wild areas" stat, facts, Roblox link `https://www.roblox.com/games/88620753214063/Steal-and-Egg`). The deck's three scenes are the `<figure class="sae-shot">` images above it; keep exactly three.
+- **Update log**: the `#updates` section in `index.html` holds one list per game (`PET DIMENSIONS LOG`, `STEAL AND EGG LOG`), newest first. To post an update, copy a whole `<li class="log-entry">` to the top of that game's `<ol>`, move `is-latest` and the `Latest` tag onto it, set its `<time datetime>` and the date text, and update the tab's small "Latest ·" line.
 - **Pet Dimensions copy**: in `index.html`, between the `========== PET DIMENSIONS COPY ==========` comments inside the games section. This holds the big art title, the name, blurb, the "500+ pets" stat, the facts and the Play button. A few of those words are repeated elsewhere, so change them there too:
   - the `<head>`: the meta `description`, `og:description` and `twitter:description` tags (they mention "500+ pets");
   - the rift marquee just above the games section (two identical lines; the second is the seamless-loop copy);

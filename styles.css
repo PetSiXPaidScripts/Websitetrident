@@ -10,12 +10,13 @@
    DM Sans for body and tracked micro-labels.
    Motion lives in script.js; this file holds layout, states and fallbacks.
 
-    0. Tokens            6. Rift (energy tear) 12. Cursor
-    1. Base / reset      7. Games (portal)    13. Intro curtain
-    2. Shared atoms      8. Creator           14. Motion states (hide-before-reveal)
-    3. Buttons + roll    9. Quote             15. Responsive
-    4. Header / nav     10. Community         16. No-JS + reduced motion
-    5. Sky + hero       11. Contact + footer
+    0. Tokens            6. Rift (energy tear) 10. Community
+    1. Base / reset      7. Games (portal)    11. Contact + footer
+    2. Shared atoms     7b. Steal and Egg     12. Cursor
+    3. Buttons + roll   7c. Update log        13. Intro curtain
+    4. Header / nav      8. Creator           14. Motion states (hide-before-reveal)
+    5. Sky + hero        9. Quote             15. Responsive
+                                              16. No-JS + reduced motion
    ========================================================================== */
 
 /* 0. Tokens ---------------------------------------------------------------- */
@@ -286,7 +287,7 @@ html.motion:not(.no-anim) .rift-band,html.marquee-js .rift-lean{will-change:tran
 /* 7. Games ----------------------------------------------------------------- */
 .section{position:relative;width:100%;max-width:calc(var(--max) + var(--gutter) * 2);margin:0 auto;padding:clamp(110px,13vw,190px) var(--gutter)}
 /* native anchor offset (also keeps the browser's own hash jump on load under the header) */
-:is(#games,#creator,#community,#contact){scroll-margin-top:-16px} /* + html scroll-padding = exactly the header height */
+:is(#games,#updates,#creator,#community,#contact){scroll-margin-top:-16px} /* + html scroll-padding = exactly the header height */
 h2{font-size:clamp(38px,5.4vw,88px)}
 .section-heading{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:flex-end;gap:50px;margin-bottom:clamp(48px,6vw,84px)}
 .section-intro{max-width:320px;color:var(--muted);font-size:15.5px;line-height:1.7;padding-bottom:12px}
@@ -401,6 +402,182 @@ h2{font-size:clamp(38px,5.4vw,88px)}
 .game-card.is-cinematic .game-desc{font-size:clamp(16.5px,1.3vw,19px);color:var(--text-2)}
 /* smaller screens (class added by JS): the rift waits in a dark card and tears open as you scroll */
 .game-card.is-iris .game-art{background:radial-gradient(ellipse 60% 55% at 50% 50%,#0b1d45,var(--bg) 80%)}
+
+/* 7b. Steal and Egg (the heist deck) ------------------------------------------
+   The second card mirrors the first (info left, art right). Its art is a moonlit
+   farm: a low moon, the rainbow egg's aura, a guard's flashlight sweeping the
+   night, and the game's own thumbnails dealt as a 3D deck. Every self-running
+   loop is a transform on a pre-rendered layer; [data-depth] sits on wrappers so
+   the pointer drift (GSAP, inline) never fights a CSS animation. */
+.sae-stage{position:relative;margin-top:clamp(64px,8vw,120px)}
+.game-card.game-card-sae{grid-template-columns:minmax(0,.78fr) minmax(0,1.22fr)}
+.game-card-sae .game-art{order:2;border-right:0;border-left:1px solid var(--line);background:radial-gradient(ellipse 85% 70% at 70% 18%,#16367e 0%,#0c2257 34%,#081634 62%,#050d22 100%)}
+.game-card-sae .game-info{order:1}
+.sae-scene{position:absolute;inset:0;overflow:hidden}
+.sae-layer{position:absolute;inset:0;display:block}
+/* the farm's horizon: a soft rim of moonlight on the ground line */
+.sae-scene::after{content:"";position:absolute;left:-10%;right:-10%;bottom:-38%;height:62%;border-radius:50%;background:radial-gradient(ellipse at 50% 0%,rgba(61,220,132,.16),rgba(8,40,40,.55) 42%,rgba(5,13,34,.95) 70%);box-shadow:0 -1px 0 rgba(166,233,255,.16),0 -18px 60px -20px rgba(95,211,255,.25)}
+.sae-moon{position:absolute;right:11%;top:8%;width:clamp(70px,9vw,118px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 36% 34%,#fffef6 0,#fff4cc 34%,#f6d98e 66%,#e3b45a 100%);box-shadow:0 0 50px 10px rgba(255,236,170,.28),0 0 140px 40px rgba(95,211,255,.12)}
+.sae-moon::after{content:"";position:absolute;left:24%;top:52%;width:18%;height:18%;border-radius:50%;background:rgba(214,170,90,.35);box-shadow:30px -24px 0 -4px rgba(214,170,90,.25),14px 10px 0 -6px rgba(214,170,90,.3)}
+/* the rainbow egg's aura behind the deck: a conic rainbow with its falloff baked in, turning slowly */
+.sae-aura{position:absolute;left:50%;top:46%;width:min(96%,700px);aspect-ratio:1;background:url(assets/fx/rainbow-aura.webp) center/100% 100% no-repeat;opacity:.5;transform:translate(-50%,-50%);animation:auraTurn 36s linear infinite}
+@keyframes auraTurn{from{transform:translate(-50%,-50%) rotate(0)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+/* the guard's flashlight: a soft cone hung from the top edge, sweeping to and fro */
+.sae-beam{position:absolute;left:12%;top:-6%;width:46%;height:118%;transform-origin:50% 0;background:conic-gradient(from 162deg at 50% 0%,transparent 0deg,rgba(255,244,205,.09) 10deg,rgba(255,246,214,.22) 18deg,rgba(255,244,205,.09) 26deg,transparent 36deg);-webkit-mask:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);mask:linear-gradient(180deg,#000 0%,#000 55%,transparent 100%);animation:beamSweep 9s ease-in-out infinite alternate}
+@keyframes beamSweep{from{transform:rotate(-24deg)}to{transform:rotate(30deg)}}
+.sae-sparks i:nth-child(1){left:10%;top:22%}
+.sae-sparks i:nth-child(2){left:44%;top:9%;animation-delay:.8s;width:9px;height:9px}
+.sae-sparks i:nth-child(3){left:88%;top:44%;animation-delay:1.6s}
+.sae-sparks i:nth-child(4){left:20%;top:64%;animation-delay:2.2s;width:8px;height:8px;--c:var(--gold-hi)}
+.sae-sparks i:nth-child(5){left:70%;top:6%;animation-delay:1.2s;width:7px;height:7px}
+.sae-sparks i:nth-child(6){left:62%;top:80%;animation-delay:2.8s;width:9px;height:9px;--c:var(--gold-hi)}
+
+/* the deck: a 16:9 slot (centred with the individual `translate`, so GSAP's transform never fights it) */
+.sae-deck{position:absolute;z-index:1;left:54%;top:43%;width:min(60%,500px);aspect-ratio:16/9;translate:-50% -50%;perspective:1300px;perspective-origin:50% 30%}
+.sae-tilt{position:absolute;inset:0;transform-style:preserve-3d}
+.sae-shot{position:absolute;inset:0;margin:0;transform-style:preserve-3d;cursor:pointer;z-index:var(--z,1);transform:translate3d(var(--tx,0%),var(--ty,0%),var(--tz,0px)) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) rotateZ(var(--rz,0deg)) scale(var(--s,1));transition:transform 1.05s var(--ease-out)}
+.sae-shot.pos-0{--z:3;--rx:4deg;--ry:-12deg;--rz:-2deg;cursor:default}
+.sae-shot.pos-1{--z:2;--tx:15%;--ty:-15%;--tz:-130px;--ry:-18deg;--rz:5deg;--s:.88}
+.sae-shot.pos-2{--z:1;--tx:-17%;--ty:-24%;--tz:-250px;--ry:-6deg;--rz:-6deg;--s:.78}
+.sae-shot-in{position:relative;width:100%;height:100%;border-radius:16px;overflow:hidden;background:#0b1d45;box-shadow:0 34px 60px -24px rgba(0,0,0,.85),0 0 0 1px rgba(190,245,255,.2);transition:box-shadow .8s var(--ease-out)}
+.sae-shot-in img{width:100%;height:100%;object-fit:cover}
+/* back cards sink into the night: a navy veil (opacity, cheap) instead of a filter */
+.sae-shot-in::after{content:"";position:absolute;inset:0;background:#050d22;opacity:0;pointer-events:none;transition:opacity .9s var(--ease-out)}
+.sae-shot.pos-1 .sae-shot-in::after{opacity:.38}
+.sae-shot.pos-2 .sae-shot-in::after{opacity:.6}
+/* the front card catches the light: gold rim + a glint that crosses it now and then */
+.sae-shot.pos-0 .sae-shot-in{box-shadow:0 40px 70px -26px rgba(0,0,0,.9),0 0 0 1.5px rgba(255,226,122,.75),0 0 46px -8px rgba(249,198,27,.55)}
+.sae-shot-in::before{content:"";position:absolute;z-index:1;top:-20%;bottom:-20%;left:0;width:34%;background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.4) 50%,transparent 80%);transform:translateX(-140%) skewX(-18deg);pointer-events:none;opacity:0}
+.sae-shot.pos-0 .sae-shot-in::before{opacity:1;animation:glint 6.5s var(--ease-io) 1.4s infinite}
+@media (hover:hover){.sae-shot:not(.pos-0):hover .sae-shot-in::after{opacity:.12}}
+
+/* scene picker under the deck: Steal / Race / Ride (a stories-style bar runs while the deck shuffles itself) */
+.sae-picker{position:absolute;z-index:4;left:50%;top:calc(100% + clamp(18px,2.4vw,30px));translate:-50% 0;display:flex;gap:4px;padding:4px;border:1px solid rgba(190,245,255,.22);border-radius:999px;background:rgba(5,13,34,.66);box-shadow:0 18px 40px -20px rgba(0,0,0,.9)}
+.sae-pick{position:relative;overflow:hidden;min-width:64px;min-height:34px;padding:0 15px;border:0;border-radius:999px;background:transparent;font:600 13.5px/1 var(--f-round);letter-spacing:.03em;color:var(--text-2);cursor:pointer;transition:color .45s var(--ease-out),background-color .45s var(--ease-out)}
+.sae-pick[aria-pressed="true"]{color:var(--ink);background:linear-gradient(180deg,#ffe066 0%,var(--gold) 55%,#f3a90f 100%);box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -2px 0 rgba(196,96,8,.4)}
+.sae-pick:focus-visible{outline-offset:2px;border-radius:999px}
+.sae-pick-bar{position:absolute;left:12px;right:12px;bottom:4px;height:2px;border-radius:2px;background:rgba(7,19,46,.5);transform:scaleX(0);transform-origin:left;pointer-events:none}
+.game-card-sae.is-auto .sae-pick[aria-pressed="true"] .sae-pick-bar{animation:pickBar var(--deck-ms,5200ms) linear forwards}
+@keyframes pickBar{to{transform:scaleX(1)}}
+@media (hover:hover){.sae-pick:not([aria-pressed="true"]):hover{color:#fff;background:rgba(95,211,255,.14)}}
+/* no JS: the deck is a still life and the picker can't work */
+html:not(.deck-js) .sae-picker{display:none}
+
+/* the lockup: STEAL AND (cyan) over a golden EGG!, in the same banner voice as PET / DIMENSIONS */
+.sae-label{z-index:3}
+.sae-label .lm>span{color:var(--ice);text-shadow:0 2px 0 rgba(8,48,110,.9)}
+.sae-label strong{color:#ffe9a6;text-shadow:0 3px 0 #8a4a07,0 6px 0 #3b1d04,0 0 22px rgba(249,198,27,.45)}
+
+@media (max-width:1100px) and (min-width:851px){.game-card.game-card-sae{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)}}
+@media (max-width:850px){
+  .game-card.game-card-sae{grid-template-columns:minmax(0,1fr)}
+  .game-card-sae .game-art{order:0;border-left:0;border-bottom:1px solid var(--line);min-height:480px}
+  .game-card-sae .game-info{order:1}
+  .sae-deck{left:50%;top:45%;width:min(74%,440px)}
+}
+@media (max-width:560px){
+  .game-card-sae .game-art{min-height:440px}
+  .sae-deck{top:42%;width:78%}
+  .sae-shot.pos-1{--tx:12%;--ty:-16%}
+  .sae-shot.pos-2{--tx:-13%;--ty:-27%}
+  .sae-pick{min-width:58px;padding:0 12px;font-size:13px}
+  .sae-moon{right:8%;top:6%}
+}
+
+/* 7c. Update log ----------------------------------------------------------------
+   A sticky game switcher (ARIA tabs) beside a star-chart timeline: a hairline
+   that draws down the page, a sparkle on each update, and on the newest one a
+   comet of gold light running round its border. Without JS (or if script.js
+   never boots) both logs simply sit one under the other. */
+.updates-section{padding-top:clamp(80px,9vw,150px);padding-bottom:clamp(70px,8vw,130px)}
+.c-updates{right:var(--gutter);top:clamp(20px,3vw,50px);width:min(320px,26vw);height:130px}
+.log{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:clamp(32px,5vw,84px);align-items:start}
+.log-tabs{position:sticky;top:calc(var(--header-h) + 28px);display:flex;flex-direction:column;gap:8px;padding:8px;border:1px solid var(--line);border-radius:26px;background:linear-gradient(160deg,rgba(13,33,82,.55),rgba(6,16,41,.55));box-shadow:0 40px 80px -50px rgba(0,0,0,.9)}
+.log-tab{position:relative;z-index:1;display:grid;grid-template-columns:52px minmax(0,1fr);align-items:center;gap:14px;min-height:76px;padding:12px 16px 12px 12px;border:0;border-radius:19px;background:transparent;text-align:left;color:var(--text-2);cursor:pointer;transition:color .45s var(--ease-out)}
+.log-tab img{width:52px;height:52px;border-radius:14px;box-shadow:0 0 0 1px rgba(190,245,255,.22),0 12px 26px -12px rgba(0,0,0,.9);transition:transform .7s var(--ease-out),box-shadow .5s var(--ease-out)}
+.log-tab-text{display:flex;flex-direction:column;gap:7px;min-width:0}
+.log-tab-name{font:700 17.5px/1.1 var(--f-round);letter-spacing:.01em}
+.log-tab-meta{font:600 10px/1.2 var(--f-body);letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.log-tab[aria-selected="true"]{color:#fff}
+.log-tab[aria-selected="true"] img{transform:rotate(-4deg) scale(1.06);box-shadow:0 0 0 1.5px rgba(255,226,122,.8),0 0 26px -6px rgba(249,198,27,.6),0 12px 26px -12px rgba(0,0,0,.9)}
+.log-tab[aria-selected="true"] .log-tab-meta{color:var(--gold-hi)}
+.log-tab:focus-visible{outline-offset:-2px;border-radius:19px}
+@media (hover:hover){.log-tab:not([aria-selected="true"]):hover{color:#fff}.log-tab:not([aria-selected="true"]):hover img{transform:scale(1.05)}}
+/* the selection glow slides under the chosen tab (script.js writes its box: --gx / --gy / --gw / --gh) */
+.log-tab-glow{position:absolute;z-index:0;left:0;top:0;width:var(--gw,0px);height:var(--gh,0px);transform:translate(var(--gx,0px),var(--gy,0px));border-radius:19px;background:linear-gradient(160deg,rgba(26,127,230,.34),rgba(95,211,255,.1));box-shadow:inset 0 0 0 1px rgba(166,233,255,.3),0 16px 40px -18px rgba(95,211,255,.55);opacity:0;transition:transform .75s var(--ease-out),width .75s var(--ease-out),height .75s var(--ease-out),opacity .4s}
+html.log-js .log-tab-glow{opacity:1}
+html.log-js .log-tab[aria-selected="true"]{background:transparent}
+
+.log-panel{position:relative}
+.log-panel:focus-visible{outline-offset:10px;border-radius:24px}
+.log-panel[hidden]{display:none}
+.log-game{font:700 clamp(26px,3vw,40px)/1 var(--f-round);text-transform:uppercase;letter-spacing:.01em;color:var(--ice);margin:0 0 26px 48px}
+/* the timeline: one hairline behind the sparkles, gold at the newest end, fading into the past */
+.log-rail{position:absolute;left:12px;top:30px;bottom:30px;width:2px}
+.log-line{position:absolute;inset:0;border-radius:2px;background:linear-gradient(180deg,var(--gold-hi) 0%,var(--cyan) 22%,rgba(95,211,255,.35) 70%,rgba(95,211,255,0) 100%);transform-origin:50% 0;box-shadow:0 0 12px rgba(95,211,255,.35)}
+html.log-js .log-rail{top:30px}
+.log-list{list-style:none;margin:0;padding:0;display:grid;gap:22px}
+.log-entry{position:relative;padding-left:52px}
+.log-node{position:absolute;left:1px;top:26px;width:24px;height:24px}
+.log-node::before{content:"";position:absolute;inset:-12px;border-radius:50%;background:radial-gradient(circle,rgba(166,233,255,.55),rgba(166,233,255,.1) 42%,transparent 66%)}
+.log-node::after{content:"";position:absolute;inset:3px;background:#e6f8ff;clip-path:var(--sparkle)}
+.is-latest .log-node::before{background:radial-gradient(circle,rgba(255,226,122,.75),rgba(249,198,27,.18) 42%,transparent 66%)}
+.is-latest .log-node::after{inset:0;background:var(--gold-hi);animation:nodeTwinkle 3.2s ease-in-out infinite} /* on the glyph, so GSAP's pop-in on the node never fights it */
+@keyframes nodeTwinkle{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.18) rotate(45deg)}}
+
+.log-card{position:relative;isolation:isolate;padding:26px clamp(22px,2.6vw,34px) 26px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(160deg,rgba(13,33,82,.78) 0%,rgba(8,22,52,.66) 55%,rgba(6,16,41,.74) 100%);box-shadow:0 34px 70px -44px rgba(0,0,0,.9),inset 0 1px 0 rgba(166,233,255,.08);transition:border-color .5s var(--ease-out)} /* (no transform transition: GSAP slides the cards in) */
+@media (hover:hover){.log-entry:not(.is-latest) .log-card:hover{border-color:rgba(166,233,255,.3)}}
+/* the newest update: a comet of gold light runs round the border (an animated conic angle, ringed by a mask) */
+@property --beam{syntax:"<angle>";inherits:false;initial-value:0deg}
+.is-latest .log-card{border-color:rgba(249,198,27,.22);background:linear-gradient(160deg,rgba(18,44,104,.85) 0%,rgba(9,26,62,.72) 55%,rgba(6,16,41,.8) 100%)}
+.is-latest .log-card::before{content:"";position:absolute;inset:-1px;z-index:-1;border-radius:inherit;padding:1.5px;background:conic-gradient(from var(--beam),transparent 0deg,transparent 250deg,rgba(95,211,255,.6) 300deg,rgba(255,226,122,.95) 340deg,#fff 352deg,transparent 360deg);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;animation:beamRun 5.5s linear infinite;pointer-events:none}
+.is-latest .log-card::after{content:"";position:absolute;z-index:-2;inset:0;border-radius:inherit;background:radial-gradient(ellipse 60% 75% at 100% 0%,rgba(249,198,27,.13),transparent 70%);pointer-events:none} /* inside the card: a glow past its edge would widen the page on phones */
+@keyframes beamRun{to{--beam:360deg}}
+.log-head{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:14px}
+.log-date{font:600 11px/1 var(--f-body);letter-spacing:.24em;text-transform:uppercase;color:var(--dim)}
+.log-tag{display:inline-flex;align-items:center;gap:7px;height:24px;padding:0 11px;border:1px solid rgba(249,198,27,.45);border-radius:999px;background:rgba(249,198,27,.09);font:700 11px/1 var(--f-round);letter-spacing:.08em;text-transform:uppercase;color:var(--gold-hi);box-shadow:0 0 18px -8px rgba(249,198,27,.8)}
+.log-tag::before{content:"";width:8px;height:8px;background:currentColor;clip-path:var(--sparkle)}
+.log-title{margin:0;font:700 clamp(26px,2.6vw,38px)/1.02 var(--f-round);letter-spacing:.005em;text-transform:uppercase;color:#fff}
+.log-kicker{display:block;margin-bottom:8px;font:600 12px/1.3 var(--f-round);letter-spacing:.32em;color:var(--gold-hi);text-shadow:0 2px 0 rgba(8,48,110,.9)}
+.is-latest .log-title{color:#7fe0fb;text-shadow:0 3px 0 #0a2f72,0 6px 0 #061a45,0 0 18px rgba(56,200,240,.4)}
+.log-notes{list-style:none;margin:20px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 30px}
+.log-notes li{position:relative;padding-left:22px;color:var(--muted);font-size:15px;line-height:1.55;text-wrap:pretty}
+.log-notes li::before{content:"";position:absolute;left:1px;top:.42em;width:10px;height:10px;background:var(--cyan);clip-path:var(--sparkle)}
+.is-latest .log-notes li{color:var(--text-2)}
+.is-latest .log-notes li::before{background:var(--gold-hi)}
+.log-more{margin-top:18px;color:var(--dim);font-size:13.5px;font-style:italic}
+
+/* with JS: one log at a time; the panel's own heading is read out, not shown (the tab names it) */
+html.log-js .log-game{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* without JS (or a boot failure): no switcher, both logs stacked */
+html:not(.log-js) .log{display:block}
+html:not(.log-js) .log-tabs{display:none}
+html:not(.log-js) .log-panel+.log-panel{margin-top:70px}
+
+@media (max-width:1100px) and (min-width:851px){.log{grid-template-columns:minmax(0,270px) minmax(0,1fr)}.log-tab-name{font-size:16px}}
+@media (max-width:1000px){.log-notes{grid-template-columns:minmax(0,1fr);gap:10px}}
+@media (max-width:850px){
+  .log{grid-template-columns:minmax(0,1fr);gap:34px}
+  .log-tabs{position:relative;top:auto;flex-direction:row;border-radius:24px}
+  .log-tab{flex:1 1 0;grid-template-columns:40px minmax(0,1fr);gap:11px;min-height:66px;padding:10px 12px 10px 10px}
+  .log-tab img{width:40px;height:40px;border-radius:11px}
+  .log-tab-name{font-size:15.5px}
+  .log-tab-meta{letter-spacing:.14em}
+  .log-notes{grid-template-columns:minmax(0,1fr);gap:10px}
+  .c-updates{top:70px;width:40vw;height:110px;opacity:.8}
+}
+@media (max-width:560px){
+  .c-updates{display:none}
+  .log-tab{grid-template-columns:minmax(0,1fr);justify-items:center;text-align:center;gap:8px;padding:12px 8px}
+  .log-tab img{width:44px;height:44px}
+  .log-tab-meta{display:none}
+  .log-entry{padding-left:40px}
+  .log-rail{left:8px}
+  .log-node{left:-3px;width:22px;height:22px}
+  .log-card{padding:22px 20px 22px;border-radius:20px}
+  .log-title{font-size:min(28px,7.4vw)}
+  .log-game{margin-left:40px}
+}
 
 /* 8. Creator --------------------------------------------------------------- */
 .creator-section{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(48px,8vw,130px);align-items:center;overflow-x:clip} /* the spinning orbit's rotated box never widens the page */
@@ -661,8 +838,14 @@ html.motion:not(.no-anim) .is-idle,html.motion:not(.no-anim) .is-idle *,html.mot
   .nav-link{padding-left:10px;padding-right:10px}
   .nav-link::after{left:10px;right:10px}
 }
+/* 961–1100: five sections + the CTA keep the gutter with slightly tighter links */
+@media (max-width:1100px) and (min-width:961px){
+  .nav{gap:14px}
+  .nav-link{padding-left:8px;padding-right:8px;letter-spacing:.09em}
+  .nav-link::after{left:8px;right:8px}
+}
 /* 851–1180: the heading's constellation keeps to the strip above the intro text */
-@media (max-width:1180px) and (min-width:851px){.c-games{top:0;height:96px}}
+@media (max-width:1180px) and (min-width:851px){.c-games,.c-updates{top:0;height:96px}}
 @media (max-width:1100px){
   .game-card{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .game-card.is-cinematic .worlds{left:25%;right:25%}
@@ -672,6 +855,8 @@ html.motion:not(.no-anim) .is-idle,html.motion:not(.no-anim) .is-idle *,html.mot
   .nav{gap:12px}
   .nav-cta{padding-left:16px}
 }
+/* 851–960: with five sections the row only fits with the mark alone (the link keeps its aria-label) */
+@media (max-width:960px) and (min-width:851px){.brand-word{display:none}}
 @media (max-width:920px) and (min-width:851px){
   .nav{gap:8px}
   .nav-link{padding-left:7px;padding-right:7px}
@@ -887,6 +1072,13 @@ a,button{-webkit-tap-highlight-color:transparent}
   :is(html:not(.js),html.no-anim:not(.ready)) .nav-link{min-height:44px;font:600 9.5px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;padding:17px 5px;border:0}
   :is(html:not(.js),html.no-anim:not(.ready)) :is(.nav-num,.nav-cta,.nav-kicker,.nav-foot,.brand-word){display:none}
   :is(html:not(.js),html.no-anim:not(.ready)) .brand{min-width:44px;justify-content:center}
+}
+/* narrow phones: five links don't fit one row, so they wrap to two under a taller bar */
+@media (max-width:400px){
+  :is(html:not(.js),html.no-anim:not(.ready)){--header-h:96px}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav{min-width:0;flex:1 1 auto;justify-content:flex-end}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav-list{flex-wrap:wrap;justify-content:flex-end}
+  :is(html:not(.js),html.no-anim:not(.ready)) .nav-link{min-height:36px;padding:12px 5px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
