@@ -948,6 +948,19 @@
     }
 
     function buildHero(mm) {
+      // a page without the hero (updates.html): only the header comes in, and the page's first section is
+      // built at once (it sits right under the header), the rest of the deferred layer follows as usual
+      if (!$('.hero')) {
+        heroEntrance = () => {
+          const first = $('main > section');
+          if (first) ensureRest(first);
+          gsap.timeline({ onComplete: () => onEntranceDone() })
+            .fromTo(['.site-header > .brand', '.site-header > .nav', '.site-header > .menu-toggle'],
+              { opacity: 0, y: -18 }, { opacity: 1, y: 0, duration: 1.1, stagger: 0.08, clearProps: 'transform' }, 0.1)
+            .add(() => { if (sky) sky.shoot(); }, 0.6);
+        };
+        return;
+      }
       const STAR = '30.3% 30.2%'; // the star's centre inside the logo layers
       heroEntrance = () => {
         // booted late (slow network)? play the same entrance, faster, so the copy is readable sooner

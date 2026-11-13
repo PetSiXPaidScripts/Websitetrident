@@ -1093,3 +1093,29 @@ a,button{-webkit-tap-highlight-color:transparent}
   .mark-shine,.game-sparks i,.mark-glint,.button-primary::after,.nav-cta::after{animation:none!important}
   .mark-shine{display:none}
 }
+
+/* ==========================================================================
+   UPDATES PAGE (updates.html) — the update log on its own page (11-13)
+   The section and its cards are the ones above; this only adds the page's
+   top space, the active nav item, pictures and the "All changes" list.
+   ========================================================================== */
+.page-updates main{padding-top:calc(var(--header-h) + clamp(8px,3vh,32px))}
+.nav-link[aria-current="page"]{color:#fff}
+.nav-link[aria-current="page"] .nav-num{opacity:1}
+.nav-link[aria-current="page"]::after{transform:scaleX(1);transform-origin:left}
+.log-shot{margin:20px 0 0;border-radius:16px;overflow:hidden;border:1px solid var(--line-2);background:var(--bg-2);box-shadow:0 26px 60px -34px rgba(0,0,0,.9)}
+.log-shot img{display:block;width:100%;height:100%;aspect-ratio:16/9;object-fit:cover}
+.log-shots{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:12px;margin-top:20px}
+.log-shots .log-shot{margin:0}
+.log-shots .log-shot:last-child img{aspect-ratio:auto}
+.is-latest .log-shot{border-color:rgba(249,198,27,.28)}
+.log-all{margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+.log-all summary{display:inline-flex;align-items:center;gap:10px;min-height:32px;cursor:pointer;list-style:none;font:700 12px/1 var(--f-round);letter-spacing:.16em;text-transform:uppercase;color:var(--cyan-hi)}
+.log-all summary::-webkit-details-marker{display:none}
+.log-all summary::before{content:"";width:9px;height:9px;flex:none;background:currentColor;clip-path:var(--sparkle);transition:transform .45s var(--ease-out)}
+.log-all[open] summary::before{transform:rotate(45deg) scale(1.15)}
+@media (hover:hover){.log-all summary:hover{color:#fff}}
+.log-all ul{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 28px}
+.log-all li{position:relative;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.5;text-wrap:pretty}
+.log-all li::before{content:"";position:absolute;left:1px;top:.55em;width:6px;height:6px;border-radius:50%;background:rgba(166,233,255,.6)}
+@media (max-width:1000px){.log-all ul,.log-shots{grid-template-columns:minmax(0,1fr)}.log-shots .log-shot:last-child img{aspect-ratio:16/9}}

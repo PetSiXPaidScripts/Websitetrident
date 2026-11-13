@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050d22">
+  <meta name="color-scheme" content="dark">
+  <title>Update Log — Starfall Inc.</title>
+  <meta name="description" content="Every update of Pet Dimensions and Steal and Egg, newest first: new worlds, eggs, pets and events from Starfall Inc.">
+
+  <link rel="icon" href="assets/brand/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/brand/favicon-48.png" sizes="48x48" type="image/png">
+  <link rel="icon" href="assets/brand/favicon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+
+  <link rel="canonical" href="https://bkprosyt.com/updates.html">
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://bkprosyt.com/updates.html">
+  <meta property="og:site_name" content="Starfall Inc.">
+  <meta property="og:title" content="Update Log — Starfall Inc.">
+  <meta property="og:description" content="Every update of Pet Dimensions and Steal and Egg, newest first.">
+  <meta property="og:image" content="https://bkprosyt.com/assets/brand/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="The Starfall Inc. shooting-star logo and STARFALL INC. wordmark on a night sky">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Update Log — Starfall Inc.">
+  <meta name="twitter:description" content="Every update of Pet Dimensions and Steal and Egg, newest first.">
+  <meta name="twitter:image" content="https://bkprosyt.com/assets/brand/og-image.jpg">
+  <meta name="twitter:image:alt" content="The Starfall Inc. shooting-star logo and STARFALL INC. wordmark on a night sky">
+
+  <style>html{background:#050d22}</style>
+
+  <!--
+    Progressive-enhancement switches (run before first paint):
+      .js         scripting is on
+      .motion     the visitor has NOT asked for reduced motion → hide-before-reveal styles apply
+      .show-intro first visit in this tab session → the short intro curtain plays
+      .no-anim    safety net: if script.js fails to load or has not booted after 1.5s, everything is shown
+  -->
+  <script>
+    (function (d) {
+      var h = d.documentElement;
+      h.classList.add('js');
+      var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduce) {
+        h.classList.add('motion');
+        // the update log page never plays the intro curtain (index.html does, once per tab session)
+      }
+      setTimeout(function () { if (!h.classList.contains('ready')) h.classList.add('no-anim'); }, 1500);
+    })(document);
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Unbounded (display) · Fredoka (the banner voice: wordmark, game title, accents, buttons) · DM Sans (body). Non-blocking. -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&amp;family=Fredoka:wght@500;600;700&amp;family=Unbounded:wght@500;600;700;800&amp;display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&amp;family=Fredoka:wght@500;600;700&amp;family=Unbounded:wght@500;600;700;800&amp;display=swap"></noscript>
+  <link rel="stylesheet" href="assets/vendor/lenis.css">
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="assets/vendor/gsap.min.js" defer onerror="document.documentElement.classList.add('no-anim')"></script>
+  <script src="assets/vendor/ScrollTrigger.min.js" defer></script>
+  <script src="assets/vendor/SplitText.min.js" defer></script>
+  <script src="assets/vendor/CustomEase.min.js" defer></script>
+  <script src="assets/vendor/lenis.min.js" defer></script>
+  <script src="script.js" defer onerror="document.documentElement.classList.add('no-anim')"></script>
+</head>
+<body class="page-updates">
+  <a class="skip-link" href="#top">Skip to content</a>
+
+  <!-- The night sky: a fixed navy gradient + the starfield canvas (script.js). CSS stars stand in without JS. -->
+  <div class="sky" aria-hidden="true">
+    <span class="sky-glow sky-glow-a"></span>
+    <span class="sky-glow sky-glow-b"></span>
+    <span class="sky-dots"></span>
+    <canvas class="sky-canvas"></canvas>
+  </div>
+
+  <!-- ============================== HEADER ============================== -->
+  <header class="site-header" data-header>
+    <div class="header-glass" aria-hidden="true"><span class="header-progress"></span></div>
+
+    <a class="brand" href="index.html" aria-label="Starfall Inc. home">
+      <span class="brand-mark"><img src="assets/brand/starfall-logo-sm.webp" alt="" width="360" height="348"></span>
+      <span class="brand-word">STARFALL<small>INC.</small></span>
+    </a>
+
+    <nav class="nav" id="site-nav" aria-label="Main navigation" data-lenis-prevent>
+      <p class="nav-kicker" aria-hidden="true">Navigate the sky</p>
+      <ul class="nav-list">
+        <li style="--i:0"><a class="nav-link" href="index.html#games"><span class="nav-num" aria-hidden="true">01</span><span class="roll" data-roll>Games</span></a></li>
+        <li style="--i:1"><a class="nav-link" href="updates.html" aria-current="page"><span class="nav-num" aria-hidden="true">02</span><span class="roll" data-roll>Updates</span></a></li>
+        <li style="--i:2"><a class="nav-link" href="index.html#creator"><span class="nav-num" aria-hidden="true">03</span><span class="roll" data-roll>Creator</span></a></li>
+        <li style="--i:3"><a class="nav-link" href="index.html#community"><span class="nav-num" aria-hidden="true">04</span><span class="roll" data-roll>Community</span></a></li>
+        <li style="--i:4"><a class="nav-link" href="index.html#contact"><span class="nav-num" aria-hidden="true">05</span><span class="roll" data-roll>Contact</span></a></li>
+      </ul>
+      <a class="nav-cta" href="https://www.roblox.com/games/101553263361830/Pet-Dimensions" target="_blank" rel="noopener" data-magnetic="soft" data-burst="gold">
+        <span class="nav-cta-fill" aria-hidden="true"></span>
+        <span class="roll" data-roll>Play Pet Dimensions</span>
+        <span class="nav-cta-icon" aria-hidden="true">↗</span>
+      </a>
+      <div class="nav-foot">
+        <span class="nav-foot-name" aria-hidden="true">Starfall Inc.</span>
+        <span class="nav-foot-links">
+          <a href="https://www.youtube.com/@BKProsYT" target="_blank" rel="noopener" aria-label="YouTube: @BKProsYT"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-youtube"/></svg></a>
+          <a href="https://discord.gg/petdimensions" target="_blank" rel="noopener" aria-label="Discord: discord.gg/petdimensions"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-discord"/></svg></a>
+        </span>
+      </div>
+    </nav>
+
+    <button class="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+      <span class="menu-toggle-text" aria-hidden="true"><span>Menu</span><span>Close</span></span>
+      <span class="menu-toggle-lines" aria-hidden="true"><span></span><span></span></span>
+    </button>
+  </header>
+
+  <main id="top">
+    <!-- ============================== UPDATES (its own page since 11-13) ==============================
+         One tab per game, newest first. To post an update: copy a whole <li class="log-entry"> to the
+         top of that game's <ol>, move "is-latest" and the "Latest" tag onto it, then set its date
+         (the <time datetime> too) and the tab's small "Latest ·" line. Pictures: assets/updates/
+         (webp, ~1280 px wide) in a <figure class="log-shot">. Without JS both logs show one under the other. -->
+    <section id="updates" class="section updates-section">
+      <div class="section-heading">
+        <div>
+          <div class="section-meta" data-reveal="meta">
+            <p class="eyebrow"><span class="eyebrow-star" aria-hidden="true"></span> Update log</p>
+          </div>
+          <h2 data-split>Every update, <br><em>charted.</em></h2>
+        </div>
+        <p class="section-intro" data-lines>What changed in Pet Dimensions and Steal and Egg, newest first. Pick a game to read its log.</p>
+      </div>
+      <svg class="constellation c-updates" aria-hidden="true" focusable="false" data-constellation>
+        <line x1="6%" y1="34%" x2="30%" y2="76%"/><line x1="30%" y1="76%" x2="57%" y2="38%"/><line x1="57%" y1="38%" x2="94%" y2="60%"/>
+        <circle cx="6%" cy="34%" r="2"/><circle cx="30%" cy="76%" r="2.4"/><circle class="c-gold" cx="57%" cy="38%" r="3.2"/><circle cx="94%" cy="60%" r="2.2"/>
+      </svg>
+
+      <div class="log" data-log>
+        <div class="log-tabs" role="tablist" aria-label="Update log by game">
+          <span class="log-tab-glow" aria-hidden="true"></span>
+          <button class="log-tab" type="button" role="tab" id="log-tab-pd" aria-controls="log-pd" aria-selected="true">
+            <img src="assets/games/pd-icon.webp" alt="" width="160" height="160">
+            <span class="log-tab-text"><span class="log-tab-name">Pet Dimensions</span><span class="log-tab-meta">Latest · Nov 13</span></span>
+          </button>
+          <button class="log-tab" type="button" role="tab" id="log-tab-sae" aria-controls="log-sae" aria-selected="false" tabindex="-1">
+            <img src="assets/games/sae-icon.webp" alt="" width="160" height="160">
+            <span class="log-tab-text"><span class="log-tab-name">Steal and Egg</span><span class="log-tab-meta">Latest · Race Pets</span></span>
+          </button>
+        </div>
+
+        <div class="log-panels">
+          <!-- ========== PET DIMENSIONS LOG ========== -->
+          <div class="log-panel" id="log-pd" role="tabpanel" aria-labelledby="log-tab-pd" tabindex="0">
+            <h3 class="log-game">Pet Dimensions</h3>
+            <div class="log-rail" aria-hidden="true"><span class="log-line"></span></div>
+            <ol class="log-list">
+              <li class="log-entry is-latest">
+                <span class="log-node" aria-hidden="true"></span>
+                <article class="log-card">
+                  <header class="log-head"><time class="log-date" datetime="2026-11-13">Nov 13, 2026</time><span class="log-tag">Latest</span></header>
+                  <h4 class="log-title"><span class="log-kicker">New world · Part 1</span>Lucky Block World</h4>
+                  <div class="log-shots">
+                    <figure class="log-shot"><img src="assets/updates/pd-lucky-block-world.webp" alt="Pet Dimensions Lucky Block World: a lime-green winged pet with a halo above lucky blocks, clovers and pots of gold under a rainbow" width="1280" height="720" loading="lazy" decoding="async"></figure>
+                    <figure class="log-shot"><img src="assets/updates/pd-lucky-time-trial.webp" alt="The Lucky Time Trial maze: rooms walled with yellow, green and pink lucky blocks" width="960" height="557" loading="lazy" decoding="async"></figure>
+                  </div>
+                  <ul class="log-notes">
+                    <li>A whole new Lucky Block World, through the yellow Lucky building in Spawn</li>
+                    <li>Break Lucky Blocks for Lucky Coins and Breakout Bucks, with upgrades and Auto Buy</li>
+                    <li>5 Lucky Eggs with Huges, Titanics and a Gargantuan</li>
+                    <li>Titanic and Gargantuan Lucky Chests, plus a Boost Machine</li>
+                    <li>Lucky Board: roll the dice, charge 4 pillars and summon the Lucky Boss</li>
+                    <li>The Time Trial maze, with a top 100 leaderboard</li>
+                    <li>50 hidden clovers, the Wishing Well and BK's 25 Lucky quests</li>
+                    <li>Also new: the LIMITED Borealis Egg, the Aura and Super Fluffy eggs</li>
+                  </ul>
+                  <details class="log-all">
+                    <summary>All 27 changes</summary>
+                    <ul>
+                      <li>New world: Lucky Block World</li>
+                      <li>Enter through the yellow Lucky building in Spawn</li>
+                      <li>Break Lucky Blocks for Lucky Coins and Breakout Bucks</li>
+                      <li>Lucky upgrades with Auto Buy</li>
+                      <li>Titanic and Gargantuan Lucky Chests: find the keys</li>
+                      <li>Boost Machine: better big-pet luck in Lucky Chests</li>
+                      <li>5 Lucky eggs with Huges, Titanics and a Gargantuan</li>
+                      <li>Lucky Board: roll the dice and land on rewards</li>
+                      <li>Charge the 4 pillars to summon the Lucky Boss</li>
+                      <li>Collect 5 pieces for a Huge Rainbow Lucky Block</li>
+                      <li>Find 50 hidden clovers: +1% Lucky Coins each</li>
+                      <li>Friday the 13th: mirror shards and a black cat</li>
+                      <li>Wishing Well: every server fills it together for 2x / 3x Breakout Bucks and rewards</li>
+                      <li>Every 777 blocks: your own Lucky 7 block</li>
+                      <li>Time Trial: 3 runs a day, how far can you go?</li>
+                      <li>Lucky Blocks leaderboard: the top 100 win Huges and Titanics</li>
+                      <li>Time Trial leaderboard: the top 100 win Gargantuans, Titanics and Huges</li>
+                      <li>BK is here with 25 Lucky quests</li>
+                      <li>LIMITED Borealis Egg in the shop</li>
+                      <li>New Robux egg: Aura Egg</li>
+                      <li>New gem egg: Super Fluffy Egg</li>
+                      <li>Mega Equip enchant in the shop: equip more pets</li>
+                      <li>Gargantuan Arcade Cat in the Jackpot Egg</li>
+                      <li>Extinction Machine: Totem eggs and the Huge Totem Cub</li>
+                      <li>Capybara Egg now in rewards and Forever Packs</li>
+                      <li>New Kintsugi and Lava Lamp eggs</li>
+                      <li>Bug fixes and improvements</li>
+                    </ul>
+                  </details>
+                </article>
+              </li>
+              <li class="log-entry">
+                <span class="log-node" aria-hidden="true"></span>
+                <article class="log-card">
+                  <header class="log-head"><time class="log-date" datetime="2026-11-06">Nov 6, 2026</time></header>
+                  <h4 class="log-title"><span class="log-kicker">Event update</span>Arcade Clicker</h4>
+                  <figure class="log-shot"><img src="assets/updates/pd-arcade-plaza.webp" alt="The Clicker Arcade plaza at night: neon arcade cabinets in a ring around the golden Rebirth Shrine" width="1280" height="674" loading="lazy" decoding="async"></figure>
+                  <ul class="log-notes">
+                    <li>Clicker Arcade: click, upgrade and rebirth your way up</li>
+                    <li>Four arcade games, each with its own exclusive eggs</li>
+                    <li>Rebirth Road up to 1,000 rebirths, plus a Rebirth Token Shop</li>
+                    <li>Catch the Golden Cursor for x7 clicks</li>
+                    <li>A Secret Anaglyph Agony hides in the Jackpot Egg</li>
+                    <li>Arcade Robot: 15 quests and a special Buddy</li>
+                    <li>The Global Mega Egg is back: 400M eggs</li>
+                    <li>New Exclusive Steampunk Egg in the shop</li>
+                  </ul>
+                  <p class="log-more">…and more in the in-game update log.</p>
+                </article>
+              </li>
+              <li class="log-entry">
+                <span class="log-node" aria-hidden="true"></span>
+                <article class="log-card">
+                  <header class="log-head"><time class="log-date" datetime="2026-10-30">Oct 30, 2026</time></header>
+                  <h4 class="log-title"><span class="log-kicker">Rainy World · Part 2</span>Sunken Town</h4>
+                  <ul class="log-notes">
+                    <li>Ride the Diving Bell down to Sunken Town</li>
+                    <li>6 new areas and 6 Sunken Eggs</li>
+                    <li>Titanic Rainy Blobfish and Gargantuan Rainy Turtle</li>
+                    <li>Shipwreck golden loot and Drowned Map treasure</li>
+                    <li>Light Old Feller’s 6 beacons</li>
+                    <li>Your pets swim with you underwater</li>
+                  </ul>
+                </article>
+              </li>
+              <li class="log-entry">
+                <span class="log-node" aria-hidden="true"></span>
+                <article class="log-card">
+                  <header class="log-head"><time class="log-date" datetime="2026-10-19">Oct 19, 2026</time></header>
+                  <h4 class="log-title"><span class="log-kicker">New world</span>Rainy World</h4>
+                  <ul class="log-notes">
+                    <li>A whole new Rainy World, with Rainbow Coins</li>
+                    <li>Rainy eggs and pets, plus Storm and Chroma eggs</li>
+                    <li>Storm Charge, the Bridge and the Prism</li>
+                    <li>Floods with ducks, Umbrella Float and lost umbrellas</li>
+                    <li>A Giant Ocean Chest and the Rainy Hatch leaderboard</li>
+                    <li>Also new: the Void, Dark Matter and Golden Huges</li>
+                  </ul>
+                </article>
+              </li>
+              <li class="log-entry">
+                <span class="log-node" aria-hidden="true"></span>
+                <article class="log-card">
+                  <header class="log-head"><time class="log-date" datetime="2026-10">Oct 2026</time></header>
+                  <h4 class="log-title"><span class="log-kicker">Event world</span>Halloween</h4>
+                  <ul class="log-notes">
+                    <li>A spooky Halloween World with its own Candy</li>
+                    <li>The Halloween Maze and its lucky egg capsules</li>
+                    <li>Feed the Giant Pumpkin and open its rewards</li>
+                    <li>Trick or Treat, the Witch Cauldron and the Pumpkin Potion</li>
+                    <li>The Hellfire Gift and the Ghostface Cat</li>
+                  </ul>
+                </article>
+              </li>
+              <li class="log-entry">
+                <span class="log-node" aria-hidden="true"></span>
+                <article class="log-card">
+                  <header class="log-head"><time class="log-date" datetime="2026-09">Sep 2026</time></header>
+                  <h4 class="log-title"><span class="log-kicker">Tech World · Part 2</span>Cyber Base Camp</h4>
+                  <ul class="log-notes">
+                    <li>Cyber Base Camp and 10 new Tech areas</li>
+                    <li>11 new eggs, each with its golden twin</li>
+                    <li>66 new pets and 11 new Huges to hunt</li>
+                  </ul>
+                </article>
+              </li>
+              <li class="log-entry">
+                <span class="log-node" aria-hidden="true"></span>
+                <article class="log-card">
+                  <header class="log-head"><time class="log-date" datetime="2026-09-11">Sep 11, 2026</time></header>
+                  <h4 class="log-title"><span class="log-kicker">Tech World</span>Boss &amp; Claw Machine</h4>
+                  <ul class="log-notes">
+                    <li>Team up against the Tech World boss</li>
+                    <li>The Robot questline</li>
+                    <li>The Tech Arcade claw machine, with new lootboxes and Huges</li>
+                  </ul>
+                </article>
+              </li>
+            </ol>
+          </div>
+
+          <!-- ========== STEAL AND EGG LOG ========== -->
+          <div class="log-panel" id="log-sae" role="tabpanel" aria-labelledby="log-tab-sae" tabindex="0">
+            <h3 class="log-game">Steal and Egg</h3>
+            <div class="log-rail" aria-hidden="true"><span class="log-line"></span></div>
+            <ol class="log-list">
+              <li class="log-entry is-latest">
+                <span class="log-node" aria-hidden="true"></span>
+                <article class="log-card">
+                  <header class="log-head"><time class="log-date" datetime="2026-11">Nov 2026</time><span class="log-tag">Latest</span></header>
+                  <h4 class="log-title"><span class="log-kicker">New mode</span>Race Pets</h4>
+                  <ul class="log-notes">
+                    <li>Ride your own pet on a long race track</li>
+                    <li>Challenge a player 1v1, race the bots or set a Time Trial</li>
+                    <li>Win Trophies and spend them in the Race Shop</li>
+                    <li>Climb the race ranks, from Bronze to Diamond</li>
+                    <li>A weekly race leaderboard</li>
+                  </ul>
+                </article>
+              </li>
+              <li class="log-entry">
+                <span class="log-node" aria-hidden="true"></span>
+                <article class="log-card">
+                  <header class="log-head"><time class="log-date" datetime="2026-11-01">Nov 1, 2026</time></header>
+                  <h4 class="log-title"><span class="log-kicker">Launch</span>Release day</h4>
+                  <ul class="log-notes">
+                    <li>Steal pets across 10 wild areas, from Town to Space</li>
+                    <li>Female pets lay eggs in your nests: hatch them for new pets</li>
+                    <li>Train Speed on your treadmill and lift at the Gym</li>
+                    <li>Lock your farm, set traps and swing your bat at thieves</li>
+                    <li>Hunt Legendary, Mythic and Secret pets, with Gold and Rainbow mutations</li>
+                    <li>Fish for eggs and treasure, and complete the Index</li>
+                  </ul>
+                </article>
+              </li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============================== FOOTER ============================== -->
+  <footer class="site-footer">
+    <div class="footer-top">
+      <a class="footer-brand" href="index.html" aria-label="Starfall Inc. home">
+        <img src="assets/brand/starfall-logo-sm.webp" alt="" width="360" height="348" loading="lazy">
+        <span>STARFALL<small>INC.</small></span>
+      </a>
+      <ul class="footer-links">
+        <li><a href="https://www.roblox.com/games/101553263361830/Pet-Dimensions" target="_blank" rel="noopener" data-cursor="Open Roblox"><span class="roll" data-roll>Pet Dimensions</span> <span aria-hidden="true">↗</span></a></li>
+        <li><a href="https://www.roblox.com/games/88620753214063/Steal-and-Egg" target="_blank" rel="noopener" data-cursor="Open Roblox"><span class="roll" data-roll>Steal and Egg</span> <span aria-hidden="true">↗</span></a></li>
+        <li><a href="index.html#games" data-cursor="Our games"><span class="roll" data-roll>All games</span> <span aria-hidden="true">→</span></a></li>
+        <li><a href="https://www.youtube.com/@BKProsYT" target="_blank" rel="noopener" data-cursor="Open YouTube"><span class="roll" data-roll>YouTube</span> <span aria-hidden="true">↗</span></a></li>
+        <li><a href="https://discord.gg/petdimensions" target="_blank" rel="noopener" data-cursor="Open Discord"><span class="roll" data-roll>Discord</span> <span aria-hidden="true">↗</span></a></li>
+      </ul>
+    </div>
+
+    <!-- finale: a planet's rim of light rises and the wordmark lifts above it, under a meteor shower -->
+    <div class="finale" aria-hidden="true">
+      <span class="finale-planet"></span>
+      <span class="finale-rim"></span>
+      <div class="footer-word" data-footer-word><span>S</span><span>T</span><span>A</span><span>R</span><span>F</span><span>A</span><span>L</span><span>L</span></div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Starfall Inc. All rights reserved.</p>
+      <div class="footer-actions">
+        <!-- shown by script.js when motion is on: stops every self-running loop (WCAG 2.2.2).
+             Its name is its visible label ("Pause motion" / "Play motion"): the hidden one is display:none. -->
+        <button class="motion-toggle" type="button" data-motion-toggle hidden><span class="motion-toggle-icon" aria-hidden="true"></span><span class="roll mt-off" data-roll>Pause motion</span><span class="roll mt-on" data-roll>Play motion</span></button>
+        <a class="footer-top-link" href="#top"><span class="roll" data-roll>Back to top</span> <span aria-hidden="true">↑</span></a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- brand glyphs (inline, referenced with <use>) -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <!-- YouTube in two fills: full colour by default; --yt-a / --yt-b recolour it (--yt-b:transparent = a monochrome glyph with the play cut out) -->
+    <symbol id="i-youtube" viewBox="0 0 24 24"><path style="fill:var(--yt-a,#ff0033)" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/><path style="fill:var(--yt-b,#fff)" d="M9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></symbol>
+    <symbol id="i-discord" viewBox="0 0 24 24"><path d="M20.317 4.37a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.865-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.74 19.74 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.1 13.1 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .078-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.3 12.3 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.029 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.331c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></symbol>
+  </svg>
+</body>
+</html>

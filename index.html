@@ -118,7 +118,7 @@
       <p class="nav-kicker" aria-hidden="true">Navigate the sky</p>
       <ul class="nav-list">
         <li style="--i:0"><a class="nav-link" href="#games"><span class="nav-num" aria-hidden="true">01</span><span class="roll" data-roll>Games</span></a></li>
-        <li style="--i:1"><a class="nav-link" href="#updates"><span class="nav-num" aria-hidden="true">02</span><span class="roll" data-roll>Updates</span></a></li>
+        <li style="--i:1"><a class="nav-link" href="updates.html"><span class="nav-num" aria-hidden="true">02</span><span class="roll" data-roll>Updates</span></a></li>
         <li style="--i:2"><a class="nav-link" href="#creator"><span class="nav-num" aria-hidden="true">03</span><span class="roll" data-roll>Creator</span></a></li>
         <li style="--i:3"><a class="nav-link" href="#community"><span class="nav-num" aria-hidden="true">04</span><span class="roll" data-roll>Community</span></a></li>
         <li style="--i:4"><a class="nav-link" href="#contact"><span class="nav-num" aria-hidden="true">05</span><span class="roll" data-roll>Contact</span></a></li>
@@ -344,136 +344,6 @@
       </div>
     </section>
 
-    <!-- ============================== UPDATES (the update log) ==============================
-         One tab per game, newest first. To post an update: copy a whole <li class="log-entry"> to the
-         top of that game's <ol>, move "is-latest" and the "Latest" tag onto it, then set its date
-         (the <time datetime> too). Without JS both logs simply show one under the other. -->
-    <section id="updates" class="section updates-section">
-      <div class="section-heading">
-        <div>
-          <div class="section-meta" data-reveal="meta">
-            <p class="eyebrow"><span class="eyebrow-star" aria-hidden="true"></span> Update log</p>
-            <span class="section-num" aria-hidden="true">02</span>
-          </div>
-          <h2 data-split>Every update, <br><em>charted.</em></h2>
-        </div>
-        <p class="section-intro" data-lines>What changed in Pet Dimensions and Steal and Egg, newest first. Pick a game to read its log.</p>
-      </div>
-      <svg class="constellation c-updates" aria-hidden="true" focusable="false" data-constellation>
-        <line x1="6%" y1="34%" x2="30%" y2="76%"/><line x1="30%" y1="76%" x2="57%" y2="38%"/><line x1="57%" y1="38%" x2="94%" y2="60%"/>
-        <circle cx="6%" cy="34%" r="2"/><circle cx="30%" cy="76%" r="2.4"/><circle class="c-gold" cx="57%" cy="38%" r="3.2"/><circle cx="94%" cy="60%" r="2.2"/>
-      </svg>
-
-      <div class="log" data-log>
-        <div class="log-tabs" role="tablist" aria-label="Update log by game">
-          <span class="log-tab-glow" aria-hidden="true"></span>
-          <button class="log-tab" type="button" role="tab" id="log-tab-pd" aria-controls="log-pd" aria-selected="true">
-            <img src="assets/games/pd-icon.webp" alt="" width="160" height="160" loading="lazy">
-            <span class="log-tab-text"><span class="log-tab-name">Pet Dimensions</span><span class="log-tab-meta">Latest · Nov 6</span></span>
-          </button>
-          <button class="log-tab" type="button" role="tab" id="log-tab-sae" aria-controls="log-sae" aria-selected="false" tabindex="-1">
-            <img src="assets/games/sae-icon.webp" alt="" width="160" height="160" loading="lazy">
-            <span class="log-tab-text"><span class="log-tab-name">Steal and Egg</span><span class="log-tab-meta">Latest · Race Pets</span></span>
-          </button>
-        </div>
-
-        <div class="log-panels">
-          <!-- ========== PET DIMENSIONS LOG ========== -->
-          <div class="log-panel" id="log-pd" role="tabpanel" aria-labelledby="log-tab-pd" tabindex="0">
-            <h3 class="log-game">Pet Dimensions</h3>
-            <div class="log-rail" aria-hidden="true"><span class="log-line"></span></div>
-            <ol class="log-list">
-              <li class="log-entry is-latest">
-                <span class="log-node" aria-hidden="true"></span>
-                <article class="log-card">
-                  <header class="log-head"><time class="log-date" datetime="2026-11-06">Nov 6, 2026</time><span class="log-tag">Latest</span></header>
-                  <h4 class="log-title"><span class="log-kicker">Event update</span>Arcade Clicker</h4>
-                  <ul class="log-notes">
-                    <li>Clicker Arcade: click, upgrade and rebirth your way up</li>
-                    <li>Four arcade games, each with its own exclusive eggs</li>
-                    <li>Rebirth Road up to 1,000 rebirths, plus a Rebirth Token Shop</li>
-                    <li>Catch the Golden Cursor for x7 clicks</li>
-                    <li>A Secret Anaglyph Agony hides in the Jackpot Egg</li>
-                    <li>Arcade Robot: 15 quests and a special Buddy</li>
-                    <li>The Global Mega Egg is back: 400M eggs</li>
-                    <li>New Exclusive Steampunk Egg in the shop</li>
-                  </ul>
-                  <p class="log-more">…and more in the in-game update log.</p>
-                </article>
-              </li>
-              <li class="log-entry">
-                <span class="log-node" aria-hidden="true"></span>
-                <article class="log-card">
-                  <header class="log-head"><time class="log-date" datetime="2026-10-30">Oct 30, 2026</time></header>
-                  <h4 class="log-title"><span class="log-kicker">Rainy World · Part 2</span>Sunken Town</h4>
-                  <ul class="log-notes">
-                    <li>Ride the Diving Bell down to Sunken Town</li>
-                    <li>6 new areas and 6 Sunken Eggs</li>
-                    <li>Titanic Rainy Blobfish and Gargantuan Rainy Turtle</li>
-                    <li>Shipwreck golden loot and Drowned Map treasure</li>
-                    <li>Light Old Feller’s 6 beacons</li>
-                    <li>Your pets swim with you underwater</li>
-                  </ul>
-                </article>
-              </li>
-              <li class="log-entry">
-                <span class="log-node" aria-hidden="true"></span>
-                <article class="log-card">
-                  <header class="log-head"><time class="log-date" datetime="2026-10-19">Oct 19, 2026</time></header>
-                  <h4 class="log-title"><span class="log-kicker">New world</span>Rainy World</h4>
-                  <ul class="log-notes">
-                    <li>A whole new Rainy World, with Rainbow Coins</li>
-                    <li>Rainy eggs and pets, plus Storm and Chroma eggs</li>
-                    <li>Storm Charge, the Bridge and the Prism</li>
-                    <li>Floods with ducks, Umbrella Float and lost umbrellas</li>
-                    <li>A Giant Ocean Chest and the Rainy Hatch leaderboard</li>
-                    <li>Also new: the Void, Dark Matter and Golden Huges</li>
-                  </ul>
-                </article>
-              </li>
-            </ol>
-          </div>
-
-          <!-- ========== STEAL AND EGG LOG ========== -->
-          <div class="log-panel" id="log-sae" role="tabpanel" aria-labelledby="log-tab-sae" tabindex="0">
-            <h3 class="log-game">Steal and Egg</h3>
-            <div class="log-rail" aria-hidden="true"><span class="log-line"></span></div>
-            <ol class="log-list">
-              <li class="log-entry is-latest">
-                <span class="log-node" aria-hidden="true"></span>
-                <article class="log-card">
-                  <header class="log-head"><time class="log-date" datetime="2026-11">Nov 2026</time><span class="log-tag">Latest</span></header>
-                  <h4 class="log-title"><span class="log-kicker">New mode</span>Race Pets</h4>
-                  <ul class="log-notes">
-                    <li>Ride your own pet on a long race track</li>
-                    <li>Challenge a player 1v1, race the bots or set a Time Trial</li>
-                    <li>Win Trophies and spend them in the Race Shop</li>
-                    <li>Climb the race ranks, from Bronze to Diamond</li>
-                    <li>A weekly race leaderboard</li>
-                  </ul>
-                </article>
-              </li>
-              <li class="log-entry">
-                <span class="log-node" aria-hidden="true"></span>
-                <article class="log-card">
-                  <header class="log-head"><time class="log-date" datetime="2026-11-01">Nov 1, 2026</time></header>
-                  <h4 class="log-title"><span class="log-kicker">Launch</span>Release day</h4>
-                  <ul class="log-notes">
-                    <li>Steal pets across 10 wild areas, from Town to Space</li>
-                    <li>Female pets lay eggs in your nests: hatch them for new pets</li>
-                    <li>Train Speed on your treadmill and lift at the Gym</li>
-                    <li>Lock your farm, set traps and swing your bat at thieves</li>
-                    <li>Hunt Legendary, Mythic and Secret pets, with Gold and Rainbow mutations</li>
-                    <li>Fish for eggs and treasure, and complete the Index</li>
-                  </ul>
-                </article>
-              </li>
-            </ol>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- ============================== CREATOR ============================== -->
     <section id="creator" class="section creator-section">
       <figure class="creator-portrait" data-portrait>
@@ -586,6 +456,7 @@
       <ul class="footer-links">
         <li><a href="https://www.roblox.com/games/101553263361830/Pet-Dimensions" target="_blank" rel="noopener" data-cursor="Open Roblox"><span class="roll" data-roll>Pet Dimensions</span> <span aria-hidden="true">↗</span></a></li>
         <li><a href="https://www.roblox.com/games/88620753214063/Steal-and-Egg" target="_blank" rel="noopener" data-cursor="Open Roblox"><span class="roll" data-roll>Steal and Egg</span> <span aria-hidden="true">↗</span></a></li>
+        <li><a href="updates.html" data-cursor="Read the log"><span class="roll" data-roll>Update log</span> <span aria-hidden="true">→</span></a></li>
         <li><a href="https://www.youtube.com/@BKProsYT" target="_blank" rel="noopener" data-cursor="Open YouTube"><span class="roll" data-roll>YouTube</span> <span aria-hidden="true">↗</span></a></li>
         <li><a href="https://discord.gg/petdimensions" target="_blank" rel="noopener" data-cursor="Open Discord"><span class="roll" data-roll>Discord</span> <span aria-hidden="true">↗</span></a></li>
       </ul>
