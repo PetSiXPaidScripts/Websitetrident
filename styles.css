@@ -1119,3 +1119,13 @@ a,button{-webkit-tap-highlight-color:transparent}
 .log-all li{position:relative;padding-left:18px;color:var(--muted);font-size:14px;line-height:1.5;text-wrap:pretty}
 .log-all li::before{content:"";position:absolute;left:1px;top:.55em;width:6px;height:6px;border-radius:50%;background:rgba(166,233,255,.6)}
 @media (max-width:1000px){.log-all ul,.log-shots{grid-template-columns:minmax(0,1fr)}.log-shots .log-shot:last-child img{aspect-ratio:16/9}}
+/* Feature rows: a picture beside a short text, the sides alternating. The text comes first in the markup and .is-flip puts the
+   picture first. Phones stack each row with the picture on top. Pictures keep their own shape (no crop). */
+.log-features{display:grid;gap:18px;margin-top:24px}
+.log-feature{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:clamp(16px,2.4vw,30px);align-items:center}
+.log-feature.is-flip{grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
+.log-feature .log-shot{margin:0}
+.log-feature .log-shot img{aspect-ratio:auto}
+.log-feature-text h5{margin:0 0 8px;font:700 clamp(18px,1.6vw,22px)/1.1 var(--f-round);letter-spacing:.02em;text-transform:uppercase;color:var(--gold-hi);text-shadow:0 2px 0 rgba(8,48,110,.9)}
+.log-feature-text p{margin:0;color:var(--text-2);font-size:15px;line-height:1.6;text-wrap:pretty}
+@media (max-width:760px){.log-feature,.log-feature.is-flip{grid-template-columns:minmax(0,1fr);gap:12px}.log-feature .log-shot{order:-1}}
